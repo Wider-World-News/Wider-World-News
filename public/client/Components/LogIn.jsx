@@ -21,7 +21,8 @@ function LogIn(props) {
         </div>
       </div>
       <div>
-        <div className="g-signin2" data-onsuccess="onSignIn">Log in with Google</div>
+        {/* <div className="g-signin2" data-onsuccess="onSignIn">Log in with Google</div> */}
+        <a href="/googlelogin"><button>Log in with Google</button></a>
       </div>
     </div>
   );
