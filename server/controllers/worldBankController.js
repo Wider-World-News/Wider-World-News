@@ -5,6 +5,7 @@ const { countries } = require('@aerapass/country-data');
 const worldBankController = {};
 
 worldBankController.getEconomicData = (req, res, next) => {
+  console.log(req.params.indicatorCode);
   const exceptionCountries = {
     Russia: 'RUS',
     Venezuela: 'VEN',
@@ -36,7 +37,7 @@ worldBankController.getEconomicData = (req, res, next) => {
   }
 
   try {
-    const url = `https://api.worldbank.org/v2/country/${countryCode}/indicator/DPANUSSPB?format=json`;
+    const url = `https://api.worldbank.org/v2/country/${countryCode}/indicator/${req.params.indicatorCode}?format=json`;
     axios({
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
