@@ -21,6 +21,14 @@ worldBankController.getEconomicData = (req, res, next) => {
     Iran: 'IRN',
     Laos: 'LAO',
   };
+  const yAxes = {
+    'SP.DYN.CBRT.IN': 'Birth rate, crude (per 1000 people)',
+    DPANYSSPB: 'Exchange rate, new LCU per USD',
+    'SP.POP.SCIE.RD.P6': 'Researchers in R&D (per million people)',
+    'EN.ATM.CO2E.KT': 'CO2 Emissions (kton)',
+    'EN.ATM.CO2E.KTbig': 'CO2 Emissions (megaton)',
+    'AG.LND.AGRI.ZS': '% Land used Agriculturally',
+  };
   let countryCode;
   if (exceptionCountries[req.params.countryName]) {
     countryCode = exceptionCountries[req.params.countryName];
@@ -43,15 +51,23 @@ worldBankController.getEconomicData = (req, res, next) => {
       url,
     })
       .then((response) => {
+        let isBig = false;
+        if (response.data[1][response.data[1].length - 5].value > 1000000) {
+          isBig = true;
+        }
         const parentObj = {
-          yAxis: response.data[1][0].indicator.value.slice(0, 30),
+          yAxis: isBig
+            ? yAxes[req.params.indicatorCode + 'big']
+            : yAxes[req.params.indicatorCode],
           data: [],
           countryName: response.data[1][0].country.value,
         };
         for (let i = 0; i < response.data[1].length; i++) {
           parentObj.data.push({
             year: Number(response.data[1][i].date),
-            value: response.data[1][i].value,
+            value: isBig
+              ? response.data[1][i].value / 1000
+              : response.data[1][i].value,
           });
         }
         res.locals.data = parentObj;
