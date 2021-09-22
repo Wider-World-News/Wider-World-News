@@ -8,7 +8,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // eslint-disable-next-line import/no-dynamic-require
 const apiRouter = require(path.join(__dirname, 'routes/api.js'));
-const googleOauthRouter = require(path.join(__dirname, 'routes/api.js'));
+const googleOauthRouter = require(path.join(__dirname, 'routes/googleLogin.js'));
 const worldBankRouter = require(path.join(
   __dirname,
   'routes/worldBankRouter.js'
