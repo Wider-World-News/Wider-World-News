@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const MONGO_URI = 'mongodb+srv://bk:bananaTER@cluster0.lnd8g.mongodb.net/WiderWorldNews?retryWrites=true&w=majority';
+const MONGO_URI = 'mongodb+srv://bk:astarael@cluster0.lnd8g.mongodb.net/WiderWorldNews?retryWrites=true&w=majority';
 
 const SALT_WORK_FACTOR = 10;
 const bcrypt = require('bcryptjs');
@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  dbName: 'WiderWorldNews',
+  dbName: 'Users',
 })
   .then(() => console.log('Connected to Mongo DB.'))
   .catch((err) => console.log(`Error found inside the mongoose.connect method: ${err}`));

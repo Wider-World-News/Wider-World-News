@@ -1,6 +1,7 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable max-len */
 import React, { useEffect, useState } from 'react';
-import fetch from 'isomorphic-fetch';
+import axios from 'axios';
 import LogIn from './LogIn.jsx';
 import Welcome from './Welcome.jsx';
 
@@ -21,19 +22,17 @@ function NavBar(props) {
         username: username.value,
         password: password.value,
       };
-      fetch('/api/login', {
+      axios('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(user),
-
+        data: user,
       })
-        .then((res) => res.json())
         .then((data) => {
-          if (!Array.isArray(data)) throw Error('wrong');
-          if (Array.isArray(data)) {
+          if (!Array.isArray(data.data)) throw Error('wrong');
+          if (Array.isArray(data.data)) {
             setFavorites({});
             const favoritesObj = {};
-            data.forEach((elem) => {
+            data.data.forEach((elem) => {
               favoritesObj[elem.title] = elem.link;
             });
             setFavorites(favoritesObj);
@@ -60,24 +59,26 @@ function NavBar(props) {
         username: username.value,
         password: password.value,
       };
-      fetch('/api/signup', {
+      axios('/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(user),
+        data: user,
       })
         .then((res) => {
-          if (res.status === 200) {
+          if (res.status === 201) {
+            const result = 'You already have an account ya big dumbo';
+            changeAttempt(result);
+          }
+          else if (res.status === 200) {
             changeLoginStatus(true);
             changeUser(username.value);
           }
         })
-
         .catch((err) => console.log(err));
     }
   };
 
   const signOut = () => {
-    console.log('test');
     changeLoginStatus(false);
     changeAttempt(null);
     setFavorites({});

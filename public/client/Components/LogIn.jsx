@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable react/button-has-type */
 /* eslint-disable react/no-array-index-key */
 import React from 'react';
@@ -13,7 +14,7 @@ function LogIn(props) {
       <input name="password" placeholder="password" id="password" autoComplete="off" type="password" />
       <input name="username" placeholder="username" id="username" autoComplete="off" />
       <div id="loginAttemptMessage">{loginAttempt}</div>
-      <h1>World Wide News</h1>
+      <h1>Wider World News</h1>
     </>
   );
 }

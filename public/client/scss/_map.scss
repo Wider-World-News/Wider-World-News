@@ -1,6 +1,6 @@
-@import url("https://fonts.googleapis.com/css?family=Oswald&display=swap");
-@import url("https://fonts.googleapis.com/css?family=Cabin&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300&display=swap");
+@import url('https://fonts.googleapis.com/css?family=Oswald&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Cabin&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300&display=swap');
 
 html {
   font-size: 6vw;
@@ -93,7 +93,16 @@ p {
     display: flex;
     flex-direction: column;
   }
-
+  #mainContainer {
+    max-width: 80vw;
+    display: flex;
+    button {
+      max-height: 2rem;
+    }
+    #graph {
+      height: 100%;
+    }
+  }
   #mapContainer {
     width: 47rem;
     height: 100%;
@@ -115,7 +124,6 @@ p {
       //        -41px -41px 82px #ffffff;
     }
   }
-
   .mapboxgl-ctrl-attrib-button {
     display: none !important;
   }
