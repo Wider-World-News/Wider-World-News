@@ -4,7 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 function LogIn(props) {
-  const { loginButton, signUp, loginAttempt } = props;
+  const { loginButton, signUp, loginAttempt, googleUserInfo, googleSignOut } = props;
   return (
     <div>
       Log In
@@ -21,7 +21,9 @@ function LogIn(props) {
         </div>
       </div>
       <div>
-        <div className="g-signin2" data-onsuccess="onSignIn">Log in with Google</div>
+        {/* <div className="g-signin2" data-onsuccess="onSignIn" /> */}
+        <button className="g-signin2" onClick={googleUserInfo}>Sign in with Google</button>
+        <button onClick={googleSignOut}>Sign out of Google</button>
       </div>
     </div>
   );
