@@ -21,9 +21,7 @@ function App() {
   const [posts, setPosts] = useState([]);
 
   //grabs svg in graphHolder div to graph when country is clicked in mapbox, replaces graph on graphholder if it is there
-  const getGraph = (arg1, arg2) => {
-    const graphInput = arg1;
-    const indicatorInput = arg2;
+  const getGraph = (graphInput, indicatorInput) => {
     axios({
       method: 'GET',
       url: `/worldBank/economic/${graphInput}/${indicatorInput}`,
@@ -35,7 +33,7 @@ function App() {
         const width = 370 - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
         const svg = d3.select('#graph');
-        svg.attr('stroke-linejoin', 'round').on('dblclick', resizeChart);
+        svg.on('dblclick', resizeChart);
         const xScale = d3
           .scaleUtc()
           .domain(d3.extent(data, (d) => d.year))
@@ -216,7 +214,7 @@ function App() {
       axios('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        data: JSON.stringify(user),
+        data: user,
       })
         .then((res) => res.json())
         .then((data) => {
@@ -255,7 +253,7 @@ function App() {
       axios('/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        data: JSON.stringify(user),
+        data: user,
       })
         .then((res) => {
           if (res.status === 200) {
@@ -284,7 +282,7 @@ function App() {
     setFavorites(favoriteUpdate);
     axios('/api/addFav', {
       method: 'POST',
-      data: JSON.stringify({ currentUser, title, link }),
+      data: { currentUser, title, link },
       headers: {
         'Content-Type': 'application/json',
       },
@@ -297,7 +295,7 @@ function App() {
     setFavorites(currentFavoritesCopy);
     axios('/api/deleteFav', {
       method: 'DELETE',
-      data: JSON.stringify({ currentUser, title, link }),
+      data: { currentUser, title, link },
       headers: {
         'Content-Type': 'application/json',
       },
