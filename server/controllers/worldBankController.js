@@ -5,7 +5,6 @@ const { countries } = require('@aerapass/country-data');
 const worldBankController = {};
 
 worldBankController.getEconomicData = (req, res, next) => {
-  console.log(req.params.indicatorCode);
   const exceptionCountries = {
     Russia: 'RUS',
     Venezuela: 'VEN',
