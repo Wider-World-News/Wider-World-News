@@ -3,9 +3,20 @@ const apiController = require('../controllers/apiController');
 
 const router = express.Router();
 
-router.get('/population/:countryName', apiController.getPopulationData, (req, res) => res.status(200).json(res.locals.population));
+const populationRouter = require(path.join(__dirname, 'routes/populationData.js'));
+const newsDataRouter = require(path.join(__dirname, 'routes/newsDataRoute.js'));
+const worldBankRouter = require(path.join(__dirname, 'routes/worldBankRouter.js'));
+// router.get('/population/:countryName', apiController.getPopulationData, (req, res) => res.status(200).json(res.locals.population));
 
-router.get('/getArticles/:countryName', apiController.getArticles, (req, res) => res.status(200).json(res.locals.articles));
+//route to population data router
+router.use('/population', populationRouter);
+
+//route to news data router for articles
+router.use('/getArticles', newsDataRouter);
+
+//will route requests for world bank to the world bank router
+router.use('/', worldBankRouter);
+//may want to change route from world bank to something else
 
 // route to sign-up
 router.post('/signup', apiController.createUser,
