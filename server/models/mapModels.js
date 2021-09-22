@@ -11,7 +11,7 @@ mongoose
   .connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    dbName: 'worldwidenews',
+    dbName: 'Users',
   })
   .then(() => console.log('Connected to Mongo DB.'))
   .catch((err) =>
