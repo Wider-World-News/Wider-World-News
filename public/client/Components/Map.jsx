@@ -4,7 +4,8 @@ import mapboxGl from 'mapbox-gl/dist/mapbox-gl.js';
 import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-mapboxGl.accessToken = 'pk.eyJ1IjoibGlhbWZvbnRlcyIsImEiOiJja3RsbzdjdmQxeGZxMnBwODJ1aWlpMjgwIn0.tQGIes1AYOO8KIoAJYHTzQ';
+mapboxGl.accessToken =
+  'pk.eyJ1IjoibGlhbWZvbnRlcyIsImEiOiJja3RsbzdjdmQxeGZxMnBwODJ1aWlpMjgwIn0.tQGIes1AYOO8KIoAJYHTzQ';
 
 function Map(props) {
   const { setCurrentCountryClick, getPosts } = props;
@@ -86,26 +87,26 @@ function Map(props) {
           type: 'fill',
           source: MAPSOURCE,
           'source-layer': MAP_SOURCE_LAYER,
-          filter: [
-            '==',
-            [
-              'get',
-              'color_group',
-            ],
-            i,
-          ],
+          filter: ['==', ['get', 'color_group'], i],
           paint: {
             'fill-color': [
               'case',
-              ['boolean', ['feature-state', 'clicked'], false], colorArrFillHoverTrue[i - 1],
-              colorArrFillHoverFalse[i - 1]],
+              ['boolean', ['feature-state', 'clicked'], false],
+              colorArrFillHoverTrue[i - 1],
+              colorArrFillHoverFalse[i - 1],
+            ],
             'fill-outline-color': [
               'case',
-              ['boolean', ['feature-state', 'clicked'], false], `rgba(${0}, ${0}, ${0}, 1)`, `rgba(${255}, ${255}, ${255}, 0.5)`],
+              ['boolean', ['feature-state', 'clicked'], false],
+              `rgba(${0}, ${0}, ${0}, 1)`,
+              `rgba(${255}, ${255}, ${255}, 0.5)`,
+            ],
             'fill-opacity': [
               'case',
-              ['boolean', ['feature-state', 'hover'], false], 1, 0.5],
-
+              ['boolean', ['feature-state', 'hover'], false],
+              1,
+              0.5,
+            ],
           },
         });
 
@@ -133,7 +134,7 @@ function Map(props) {
                   sourceLayer: MAP_SOURCE_LAYER,
                   id: hoveredCountryId,
                 },
-                { hover: false },
+                { hover: false }
               );
             }
             hoveredCountryId = e.features[0].id;
@@ -143,8 +144,10 @@ function Map(props) {
                   populationData = data;
                   popup = new mapboxGl.Popup({ closeOnMove: true })
                     .setLngLat([e.lngLat.lng, e.lngLat.lat])
-                    .setHTML(`
-                  <p>Country: ${countryName} </p><p>Population: ${populationData.toLocaleString()} </p>`)
+                    .setHTML(
+                      `
+                  <p>Country: ${countryName} </p><p>Population: ${populationData.toLocaleString()} </p>`
+                    )
                     .addTo(map.current);
                   popup.addClassName('popup');
                 })
@@ -152,8 +155,10 @@ function Map(props) {
             } else {
               popup = new mapboxGl.Popup({ closeOnMove: true })
                 .setLngLat([e.lngLat.lng, e.lngLat.lat])
-                .setHTML(`
-                <p>Country: ${countryName} </p><p>Population: ${populationData.toLocaleString()} </p>`)
+                .setHTML(
+                  `
+                <p>Country: ${countryName} </p><p>Population: ${populationData.toLocaleString()} </p>`
+                )
                 .addTo(map.current);
               popup.addClassName('popup');
             }
@@ -165,7 +170,7 @@ function Map(props) {
                 sourceLayer: MAP_SOURCE_LAYER,
                 id: hoveredCountryId,
               },
-              { hover: true },
+              { hover: true }
             );
           }
         });
@@ -173,9 +178,14 @@ function Map(props) {
         map.current.on('click', `${MAP_ID}+${i}`, (e) => {
           clickCountryId = e.features[0].id;
           const countryName = e.features[0].properties.name_en;
+          console.log(countryName);
+          props.getGraph(countryName);
           if (clickCountryId !== previousCountryClicked) {
             setCurrentCountryClick(countryName);
-            getPosts(countryName);
+            if (!props.isGraphShown) {
+              getPosts(countryName);
+            }
+
             previousCountryClicked = clickCountryId;
           }
 
@@ -185,7 +195,7 @@ function Map(props) {
               sourceLayer: MAP_SOURCE_LAYER,
               id: clickCountryId,
             },
-            { clicked: true },
+            { clicked: true }
           );
           setTimeout(() => {
             map.current.setFeatureState(
@@ -194,7 +204,7 @@ function Map(props) {
                 sourceLayer: MAP_SOURCE_LAYER,
                 id: clickCountryId,
               },
-              { clicked: false },
+              { clicked: false }
             );
           }, 100);
         });
@@ -204,21 +214,16 @@ function Map(props) {
         type: 'fill',
         source: MAPSOURCE,
         'source-layer': MAP_SOURCE_LAYER,
-        filter: [
-          '==',
-          [
-            'get',
-            'disputed',
-          ],
-          'true',
-        ],
+        filter: ['==', ['get', 'disputed'], 'true'],
         paint: {
           'fill-color': `rgba(${0}, ${0}, ${255}, 0.5)`,
           'fill-outline-color': `rgba(${randomNum}, ${randomNum}, ${randomNum}, 1)`,
           'fill-opacity': [
             'case',
-            ['boolean', ['feature-state', 'hover'], false], 1, 0.5],
-
+            ['boolean', ['feature-state', 'hover'], false],
+            1,
+            0.5,
+          ],
         },
       });
 
@@ -239,9 +244,7 @@ function Map(props) {
     });
   });
 
-  return (
-    <div id="mapContainer" />
-  );
+  return <div id='mapContainer' />;
 }
 
 Map.propTypes = {
