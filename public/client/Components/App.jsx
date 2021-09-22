@@ -1,7 +1,7 @@
 /* eslint-disable react/button-has-type */
 /* eslint-disable react/no-array-index-key */
 import React, { useEffect, useState } from 'react';
-import fetch from 'isomorphic-fetch';
+
 import Map from './Map.jsx';
 import LogIn from './LogIn.jsx';
 import Welcome from './Welcome.jsx';
@@ -20,6 +20,7 @@ function App() {
   const [currentCountryClick, setCurrentCountryClick] = useState(null);
   const [posts, setPosts] = useState([]);
 
+  //grabs svg in graphHolder div to graph when country is clicked in mapbox, replaces graph on graphholder if it is there
   const getGraph = (arg) => {
     const graphInput = arg;
     axios({
@@ -50,9 +51,9 @@ function App() {
         const xAxis = d3.axisBottom(xScale).tickFormat(d3.format('d'));
         const yAxis = d3.axisLeft(yScale);
 
+        //updates graph if it is in graphHolder
         function updateChart(event) {
           if (event.selection) {
-            console.log(event);
             const extent = event.selection;
             xScale.domain([xScale.invert(extent[0]), xScale.invert(extent[1])]);
             svg.select('.brush').call(brush.move, null);
@@ -93,8 +94,6 @@ function App() {
 
             .data(data)
             .append('g')
-            // .attr('width', width)
-            // .attr('height', height)
             .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
             .append('path')
@@ -179,7 +178,7 @@ function App() {
         username: username.value,
         password: password.value,
       };
-      fetch('/api/login', {
+      axios('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user),
@@ -218,7 +217,7 @@ function App() {
         username: username.value,
         password: password.value,
       };
-      fetch('/api/signup', {
+      axios('/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user),
@@ -236,7 +235,7 @@ function App() {
 
   const getPosts = (countryName) => {
     setTimeout(async () => {
-      const postFetchData = await fetch(`/api/getArticles/${countryName}`);
+      const postFetchData = await axios(`/api/getArticles/${countryName}`);
       const postsArr = await postFetchData.json();
       setPosts(postsArr);
     }, 1000);
@@ -248,7 +247,7 @@ function App() {
       [title]: link,
     });
     setFavorites(favoriteUpdate);
-    fetch('/api/addFav', {
+    axios('/api/addFav', {
       method: 'POST',
       body: JSON.stringify({ currentUser, title, link }),
       headers: {
@@ -261,7 +260,7 @@ function App() {
     const currentFavoritesCopy = { ...currentFavorites };
     delete currentFavoritesCopy[title];
     setFavorites(currentFavoritesCopy);
-    fetch('/api/deleteFav', {
+    axios('/api/deleteFav', {
       method: 'DELETE',
       body: JSON.stringify({ currentUser, title, link }),
       headers: {
@@ -271,7 +270,6 @@ function App() {
   };
 
   const signOut = () => {
-    console.log('test');
     changeLoginStatus(false);
     changeAttempt(null);
     setFavorites({});

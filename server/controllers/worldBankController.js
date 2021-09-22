@@ -34,9 +34,6 @@ worldBankController.getEconomicData = (req, res, next) => {
     }
     countryCode = transposedCountries[req.params.countryName.toLowerCase()];
   }
-  console.log('countryName: ' + req.params.countryName);
-  console.log('countryCode: ' + countryCode);
-  // console.log(countries.RUS);
 
   try {
     const url = `https://api.worldbank.org/v2/country/${countryCode}/indicator/DPANUSSPB?format=json`;
@@ -58,7 +55,6 @@ worldBankController.getEconomicData = (req, res, next) => {
           });
         }
         res.locals.data = parentObj;
-        console.log(parentObj);
         next();
       })
       .catch((error) => next(error));
