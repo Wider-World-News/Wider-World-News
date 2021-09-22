@@ -1,7 +1,6 @@
 const axios = require('axios');
 const bcrypt = require('bcryptjs');
 const models = require('../models/mapModels');
-
 const apiController = {};
 
 apiController.getPopulationData = (req, res, next) => {
