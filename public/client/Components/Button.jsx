@@ -1,13 +1,14 @@
+/* eslint-disable react/button-has-type */
 import React from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 
 function Button(props) {
   const { signOut } = props;
-  console.log(props)
+  console.log(props);
   return (
-      <button id="signOutButton" onClick={signOut}>
-        Sign Out
-      </button>
+    <button id="signOutButton" onClick={signOut}>
+      Sign Out
+    </button>
   );
 }
 

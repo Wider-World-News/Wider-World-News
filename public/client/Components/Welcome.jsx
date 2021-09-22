@@ -3,18 +3,16 @@
 import React from 'react';
 import Button from './Button.jsx';
 
-
 function Welcome(props) {
-  const { currentUser,signOut } = props;
+  const { currentUser, signOut } = props;
   return (
-    <div id = 'welcomeDiv'>
-      Welcome
+    <>
       <div>
+        Welcome,
         {currentUser}
       </div>
       <Button key={1} signOut={signOut} />
-
-    </div>
+    </>
   );
 }
 
