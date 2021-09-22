@@ -5,14 +5,39 @@ const { countries } = require('@aerapass/country-data');
 const worldBankController = {};
 
 worldBankController.getEconomicData = (req, res, next) => {
-  delete countries.all;
-  const transposedCountries = {};
+  const exceptionCountries = {
+    Russia: 'RUS',
+    Venezuela: 'VEN',
+    Suriname: 'SUR',
+    'French Guiana': 'GUF',
+    Bolivia: 'BOL',
+    'Democratic Republic of the Congo': 'ZAR',
+    'Republic of the Congo': 'COG',
+    Tanzania: 'TZA',
+    'South Sudan': 'SDN',
+    'Ivory Coast': 'CIV',
+    Moldova: 'MDA',
+    Syria: 'SYR',
+    Iran: 'IRN',
+    Laos: 'LAO',
+  };
+  let countryCode;
+  if (exceptionCountries[req.params.countryName]) {
+    countryCode = exceptionCountries[req.params.countryName];
+  } else {
+    delete countries.all;
+    const transposedCountries = {};
 
-  for (let i = 0; i < Object.keys(countries).length; i += 1) {
-    const key = countries[Object.keys(countries)[i]];
-    transposedCountries[key.name.toLowerCase()] = key.alpha3.toLowerCase();
+    for (let i = 0; i < Object.keys(countries).length; i += 1) {
+      const key = countries[Object.keys(countries)[i]];
+      transposedCountries[key.name.toLowerCase()] = key.alpha3.toLowerCase();
+    }
+    countryCode = transposedCountries[req.params.countryName.toLowerCase()];
   }
-  const countryCode = transposedCountries[req.params.countryName.toLowerCase()];
+  console.log('countryName: ' + req.params.countryName);
+  console.log('countryCode: ' + countryCode);
+  // console.log(countries.RUS);
+
   try {
     const url = `https://api.worldbank.org/v2/country/${countryCode}/indicator/DPANUSSPB?format=json`;
     axios({
@@ -21,7 +46,19 @@ worldBankController.getEconomicData = (req, res, next) => {
       url,
     })
       .then((response) => {
-        res.locals.data = response.data;
+        const parentObj = {
+          yAxis: response.data[1][0].indicator.value.slice(0, 30),
+          data: [],
+          countryName: response.data[1][0].country.value,
+        };
+        for (let i = 0; i < response.data[1].length; i++) {
+          parentObj.data.push({
+            year: Number(response.data[1][i].date),
+            value: response.data[1][i].value,
+          });
+        }
+        res.locals.data = parentObj;
+        console.log(parentObj);
         next();
       })
       .catch((error) => next(error));

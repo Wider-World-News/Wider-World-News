@@ -7,8 +7,12 @@ import LogIn from './LogIn.jsx';
 import Welcome from './Welcome.jsx';
 import FavoriteList from './FavoriteList.jsx';
 import NewsFeed from './NewsFeed.jsx';
+import Graph from './Graph.jsx';
+import axios from 'axios';
+import * as d3 from 'd3';
 
 function App() {
+  const [isGraphShown, setIsGraphShown] = useState(true);
   const [currentFavorites, setFavorites] = useState({});
   const [loginStatus, changeLoginStatus] = useState(false);
   const [loginAttempt, changeAttempt] = useState(null);
@@ -16,12 +20,159 @@ function App() {
   const [currentCountryClick, setCurrentCountryClick] = useState(null);
   const [posts, setPosts] = useState([]);
 
+  const getGraph = (arg) => {
+    const graphInput = arg;
+    axios({
+      method: 'GET',
+      url: `/worldBank/economic/${graphInput}/`,
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((response) => {
+        const { data } = response.data;
+        const margin = { top: 30, right: 30, bottom: 30, left: 60 };
+        const width = 370 - margin.left - margin.right;
+        const height = 400 - margin.top - margin.bottom;
+        const svg = d3.select('#graph');
+        const xScale = d3
+          .scaleUtc()
+          .domain(d3.extent(data, (d) => d.year))
+          .range([0, width]);
+        const yScale = d3
+          .scaleLinear()
+          .domain(d3.extent(data, (d) => d.value))
+          .range([height, 0]);
+        const line = d3
+          .line()
+          .defined((d) => d.value !== null)
+          .curve(d3.curveCatmullRom.alpha(0.05))
+          .x((d) => xScale(d.year))
+          .y((d) => yScale(d.value));
+        const xAxis = d3.axisBottom(xScale).tickFormat(d3.format('d'));
+        const yAxis = d3.axisLeft(yScale);
+
+        function updateChart(event) {
+          if (event.selection) {
+            console.log(event);
+            const extent = event.selection;
+            xScale.domain([xScale.invert(extent[0]), xScale.invert(extent[1])]);
+            svg.select('.brush').call(brush.move, null);
+            const xAxisSelect = d3.select('.xAxis');
+            xAxisSelect
+              .transition()
+              .duration(1000)
+              .call(d3.axisBottom(xScale).tickFormat(d3.format('d')).ticks(5));
+            svg
+              .select('.line')
+              .transition()
+              .duration(1000)
+              .attr('d', line(data));
+          }
+        }
+        const brush = d3
+          .brushX()
+          .extent([
+            [0, 0],
+            [width, height + 20],
+          ])
+          .on('end', updateChart);
+        svg
+          .append('defs')
+          .append('svg:clipPath')
+          .attr('id', 'clip')
+          .append('svg:rect')
+          .attr('width', width)
+          .attr('height', height + 10)
+          .attr('x', 0)
+          .attr('y', -10);
+        if (line(data)) {
+          const graph = d3.select('#graph');
+          graph.selectChild('path').remove();
+          graph.selectChildren('g').remove();
+          graph.selectChildren('text').remove();
+          svg
+
+            .data(data)
+            .append('g')
+            // .attr('width', width)
+            // .attr('height', height)
+            .attr('transform', `translate(${margin.left}, ${margin.top})`)
+
+            .append('path')
+            .attr('d', line(data))
+            .attr('class', 'line')
+            .attr('clip-path', 'url(#clip)')
+            .attr('fill', 'none')
+            .attr('stroke', 'black');
+          svg
+            .append('g')
+            .call(xAxis)
+            .attr('class', 'xAxis')
+            .attr(
+              'transform',
+              `translate(${margin.left},${height + margin.top})`
+            );
+          svg
+            .append('g')
+            .attr('class', 'axis y')
+            .attr('transform', `translate(${margin.left}, ${margin.top})`)
+            .call(yAxis);
+          svg
+            .append('text')
+            .attr('class', 'x label')
+            .attr('text-anchor', 'middle')
+            .attr('x', (width + margin.left + margin.right) / 2)
+            .attr('y', height + margin.bottom + margin.top)
+            .attr('font-size', 10)
+            .attr('font-family', 'sans-serif')
+            .text('year');
+          svg
+            .append('text')
+            .attr('class', 'y label')
+            .attr('text-anchor', 'middle')
+            .attr('font-family', 'sans-serif')
+            .attr('x', -(height + margin.bottom + margin.top) / 2)
+            .attr('y', margin.left - 40)
+            .attr('font-size', 10)
+            .attr('transform', 'rotate(-90)')
+            .text(response.data.yAxis);
+          svg
+            .append('g')
+            .attr('class', 'brush')
+            .attr('transform', `translate(${margin.left}, ${margin.top + 20})`)
+            .call(brush);
+        } else {
+          const graph = d3.select('#graph');
+          graph.selectChild('path').remove();
+          graph.selectChild('.title').remove();
+          svg
+            .append('text')
+            .attr('class', 'noData')
+            .attr('text-anchor', 'middle')
+            .attr('font-family', 'sans-serif')
+            .attr('font-size', '20')
+            .attr('x', (width + margin.left + margin.right) / 2)
+            .attr('y', height / 2)
+            .text('No Data to Display :(');
+        }
+        svg
+          .append('text')
+          .attr('class', 'title')
+          .attr('text-anchor', 'middle')
+          .attr('font-family', 'sans-serif')
+          .attr('font-size', 14)
+          .attr('x', (width + margin.left + margin.right) / 2)
+          .attr('y', margin.top - 10)
+          .text(response.data.countryName);
+      })
+      .catch((error) => alert(graphInput + 'is not a Country'));
+  };
   const loginButton = (e) => {
     const username = document.querySelector('#username');
     const password = document.querySelector('#password');
 
     if (username.value === '' || password.value === '') {
-      const result = 'Please fill out the username and password fields to log in.';
+      const result =
+        'Please fill out the username and password fields to log in.';
       changeAttempt(result);
     } else {
       const user = {
@@ -32,7 +183,6 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user),
-
       })
         .then((res) => res.json())
         .then((data) => {
@@ -57,7 +207,8 @@ function App() {
     const password = document.querySelector('#password');
 
     if (username.value === '' || password.value === '') {
-      const result = 'Please fill out the username and password fields to sign up.';
+      const result =
+        'Please fill out the username and password fields to sign up.';
       changeAttempt(result);
     } else if (password.value.length < 5) {
       const result = 'Please create a password longer than 5 characters';
@@ -88,13 +239,14 @@ function App() {
       const postFetchData = await fetch(`/api/getArticles/${countryName}`);
       const postsArr = await postFetchData.json();
       setPosts(postsArr);
-    },
-    1000);
+    }, 1000);
   };
 
   const addFavorite = (title, link) => {
     const currentFavoritesCopy = { ...currentFavorites };
-    const favoriteUpdate = Object.assign(currentFavoritesCopy, { [title]: link });
+    const favoriteUpdate = Object.assign(currentFavoritesCopy, {
+      [title]: link,
+    });
     setFavorites(favoriteUpdate);
     fetch('/api/addFav', {
       method: 'POST',
@@ -129,29 +281,53 @@ function App() {
   };
 
   return (
-    <div className="wrapper">
-      {!loginStatus
-        ? <LogIn loginButton={loginButton} signUp={signUp} loginAttempt={loginAttempt} />
-        : [<Welcome key={1} currentUser={currentUser} signOut={signOut} />,,
-        ]}
-      <Map
-        setCurrentCountryClick={setCurrentCountryClick}
-        setPosts={setPosts}
-        getPosts={getPosts}
-      />
-      <NewsFeed
-        currentCountryClick={currentCountryClick}
-        posts={posts}
-        currentFavorites={currentFavorites}
-        setFavorites={setFavorites}
-        addFavorite={addFavorite}
-        deleteFavorite={deleteFavorite}
-      />
-
-      <FavoriteList
-        currentFavorites={currentFavorites}
-        deleteFavorite={deleteFavorite}
-      />
+    <div className='wrapper'>
+      {!loginStatus ? (
+        <LogIn
+          loginButton={loginButton}
+          signUp={signUp}
+          loginAttempt={loginAttempt}
+        />
+      ) : (
+        [<Welcome key={1} currentUser={currentUser} signOut={signOut} />, ,]
+      )}
+      <div id='mainContainer'>
+        <Map
+          setCurrentCountryClick={setCurrentCountryClick}
+          setPosts={setPosts}
+          getPosts={getPosts}
+          getGraph={getGraph}
+          isGraphShown={isGraphShown}
+        />
+        {!isGraphShown && (
+          <>
+            <NewsFeed
+              currentCountryClick={currentCountryClick}
+              posts={posts}
+              currentFavorites={currentFavorites}
+              setFavorites={setFavorites}
+              addFavorite={addFavorite}
+              deleteFavorite={deleteFavorite}
+            />
+            <FavoriteList
+              currentFavorites={currentFavorites}
+              deleteFavorite={deleteFavorite}
+            />
+          </>
+        )}
+        <button onClick={() => setIsGraphShown(!isGraphShown)}>
+          Change Displays!
+        </button>
+        {isGraphShown && (
+          <div>
+            <select id='worldBankSelector'>
+              <option value='economic'>Economic</option>
+              <option value='health'>Health</option>
+            </select>
+            <Graph getGraph={getGraph} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
