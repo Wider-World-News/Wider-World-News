@@ -10,6 +10,5 @@ router.get(
     res.status(200).send(res.locals.data);
   }
 );
-router.get('/economic/:countryName');
 
 module.exports = router;
