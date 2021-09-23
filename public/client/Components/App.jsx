@@ -23,12 +23,11 @@ function App() {
   const [currentCountryClick, setCurrentCountryClick] = useState(null);
   const [posts, setPosts] = useState([]);
 
-  // grabs svg in graphHolder div to graph when country is clicked in mapbox, replaces graph on graphholder if it is there
-  const getGraph = (arg) => {
-    const graphInput = arg;
+  //grabs svg in graphHolder div to graph when country is clicked in mapbox, replaces graph on graphholder if it is there
+  const getGraph = (graphInput, indicatorInput) => {
     axios({
       method: 'GET',
-      url: `/worldBank/economic/${graphInput}/`,
+      url: `/worldBank/economic/${graphInput}/${indicatorInput}`,
       headers: { 'Content-Type': 'application/json' },
     })
       .then((response) => {
@@ -39,6 +38,7 @@ function App() {
         const width = 370 - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
         const svg = d3.select('#graph');
+        svg.on('dblclick', resizeChart);
         const xScale = d3
           .scaleUtc()
           .domain(d3.extent(data, (d) => d.year))
@@ -50,13 +50,33 @@ function App() {
         const line = d3
           .line()
           .defined((d) => d.value !== null)
-          .curve(d3.curveCatmullRom.alpha(0.05))
+          .curve(d3.curveCatmullRom.alpha(0.02))
+          .x((d) => xScale(d.year))
+          .y((d) => yScale(d.value));
+        const nullLine = d3
+          .line()
+          .defined((d) => d.value !== null)
+          .curve(d3.curveCatmullRom.alpha(0.04))
           .x((d) => xScale(d.year))
           .y((d) => yScale(d.value));
         const xAxis = d3.axisBottom(xScale).tickFormat(d3.format('d'));
         const yAxis = d3.axisLeft(yScale);
-
-        // updates graph if it is in graphHolder
+        function resizeChart() {
+          const extent = d3.extent(data, (d) => d.year);
+          xScale.domain(extent);
+          const xAxisSelect = d3.select('.xAxis');
+          xAxisSelect
+            .transition()
+            .duration(1000)
+            .call(d3.axisBottom(xScale).tickFormat(d3.format('d')).ticks(5));
+          svg.select('.line').transition().duration(1000).attr('d', line(data));
+          svg
+            .select('.nullLine')
+            .transition()
+            .duration(1000)
+            .attr('d', nullLine(data.filter(nullLine.defined())));
+        }
+        //updates graph if it is in graphHolder
         function updateChart(event) {
           if (event.selection) {
             const extent = event.selection;
@@ -68,10 +88,15 @@ function App() {
               .duration(1000)
               .call(d3.axisBottom(xScale).tickFormat(d3.format('d')).ticks(5));
             svg
-              .select('.line')
+              .selectAll('.line')
               .transition()
               .duration(1000)
               .attr('d', line(data));
+            svg
+              .select('.nullLine')
+              .transition()
+              .duration(1000)
+              .attr('d', nullLine(data.filter(nullLine.defined())));
           }
         }
         const brush = d3
@@ -96,11 +121,18 @@ function App() {
           graph.selectChildren('g').remove();
           graph.selectChildren('text').remove();
           svg
-
+            .append('path')
+            .data(data)
+            .attr('transform', `translate(${margin.left}, ${margin.top})`)
+            .attr('stroke', '#ccc')
+            .attr('clip-path', 'url(#clip)')
+            .attr('fill', 'none')
+            .attr('class', 'nullLine')
+            .attr('d', nullLine(data.filter(nullLine.defined())));
+          svg
             .data(data)
             .append('g')
             .attr('transform', `translate(${margin.left}, ${margin.top})`)
-
             .append('path')
             .attr('d', line(data))
             .attr('class', 'line')
@@ -135,7 +167,7 @@ function App() {
             .attr('text-anchor', 'middle')
             .attr('font-family', 'sans-serif')
             .attr('x', -(height + margin.bottom + margin.top) / 2)
-            .attr('y', margin.left - 40)
+            .attr('y', margin.left - 50)
             .attr('font-size', 10)
             .attr('transform', 'rotate(-90)')
             .text(response.data.yAxis);
@@ -146,7 +178,8 @@ function App() {
             .call(brush);
         } else {
           const graph = d3.select('#graph');
-          graph.selectChild('path').remove();
+          d3.selectAll('.line').remove();
+          d3.selectAll('.nullLine').remove();
           graph.selectChild('.title').remove();
           svg
             .append('text')
@@ -174,8 +207,8 @@ function App() {
   const getPosts = (countryName) => {
     setTimeout(async () => {
       const postFetchData = await axios(`/api/getArticles/${countryName}`);
-      const postsArr = await postFetchData.json();
-      setPosts(postsArr);
+      // const postsArr = await postFetchData.json();
+      setPosts(postFetchData.data);
     }, 1000);
   };
 
@@ -187,7 +220,7 @@ function App() {
     setFavorites(favoriteUpdate);
     axios('/api/addFav', {
       method: 'POST',
-      body: JSON.stringify({ currentUser, title, link }),
+      data: { currentUser, title, link },
       headers: {
         'Content-Type': 'application/json',
       },
@@ -200,7 +233,7 @@ function App() {
     setFavorites(currentFavoritesCopy);
     axios('/api/deleteFav', {
       method: 'DELETE',
-      body: JSON.stringify({ currentUser, title, link }),
+      data: { currentUser, title, link },
       headers: {
         'Content-Type': 'application/json',
       },
@@ -249,9 +282,12 @@ function App() {
         </button>
         {isGraphShown && (
           <div>
-            <select id="worldBankSelector">
-              <option value="economic">Economic</option>
-              <option value="health">Health</option>
+            <select id='worldBankSelector'>
+              <option value='DPANUSSPB'>Economic</option>
+              <option value='SP.DYN.CBRT.IN'>Health</option>
+              <option value='SP.POP.SCIE.RD.P6'>Science and Technology</option>
+              <option value='EN.ATM.CO2E.KT'>Environmental Quality</option>
+              <option value='AG.LND.AGRI.ZS'>Agricultural Development</option>
             </select>
             <Graph getGraph={getGraph} />
           </div>
