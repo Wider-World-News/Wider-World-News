@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 
 require('dotenv').config();
 
-// const { MONGO_URI } = process.env;
-const MONGO_URI='mongodb+srv://bk:astarael@cluster0.lnd8g.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+const { MONGO_URI } = process.env;
 
 const SALT_WORK_FACTOR = 10;
 const bcrypt = require('bcryptjs');
