@@ -46,8 +46,11 @@ p {
 }
 .wrapper {
   display: flex;
+  flex-direction: column;
   height: 60%;
-
+  .ticker {
+    max-height: 2.2rem;
+  }
   #articleDiv {
     // scrolling
     text-overflow: clip;

@@ -1,7 +1,7 @@
 /* eslint-disable react/button-has-type */
 /* eslint-disable react/no-array-index-key */
 import React, { useEffect, useState } from 'react';
-
+import Ticker from 'react-ticker';
 import Map from './Map.jsx';
 import LogIn from './LogIn.jsx';
 import Welcome from './Welcome.jsx';
@@ -19,7 +19,31 @@ function App() {
   const [currentUser, changeUser] = useState(null);
   const [currentCountryClick, setCurrentCountryClick] = useState(null);
   const [posts, setPosts] = useState([]);
-
+  const [tickerPosts, setTickerPosts] = useState([]);
+  useEffect(() => {
+    const random = Math.floor(Math.random() * 10);
+    const countryArr = [
+      'Uganda',
+      'Uruguay',
+      'Finland',
+      'Sweden',
+      'Uzbekistan',
+      'Sudan',
+      'Australia',
+      'Japan',
+      'Thailand',
+      'China',
+    ];
+    axios({
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      url: `api/getArticles/${countryArr[random]}`,
+    }).then((response) => {
+      const titles = [];
+      response.data.forEach((el) => titles.push(el.title));
+      setTickerPosts(titles);
+    });
+  }, []);
   //grabs svg in graphHolder div to graph when country is clicked in mapbox, replaces graph on graphholder if it is there
   const getGraph = (graphInput, indicatorInput) => {
     axios({
@@ -313,6 +337,19 @@ function App() {
 
   return (
     <div className='wrapper'>
+      <div>
+        {tickerPosts.length > 0 && (
+          <Ticker>
+            {({ index }) => (
+              <>
+                <p style={{ paddingRight: '0.5em' }}>
+                  {tickerPosts[index % 5]}!
+                </p>
+              </>
+            )}
+          </Ticker>
+        )}
+      </div>
       {!loginStatus ? (
         <LogIn
           loginButton={loginButton}
