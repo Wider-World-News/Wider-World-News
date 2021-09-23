@@ -27,12 +27,12 @@ const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, ENCODED_SECRET } = process.env;
 const oauth2Client = new google.auth.OAuth2(
   CLIENT_ID,
   CLIENT_SECRET,
-  REDIRECT_URI
+  REDIRECT_URI,
 );
 
 // functionality to check if new user needs to be created
 async function checkUser(currentUser) {
-  console.log('currentUser:', currentUser);
+  // console.log('currentUser:', currentUser);
   const {
     user_id,
     email,
@@ -56,11 +56,11 @@ async function checkUser(currentUser) {
       });
 
       // check in the console for newUser
-      console.log(newUser);
+      // console.log(newUser);
     }
     // take user_id & prepare query link for frontend to GET user's info from databse
-    const userQuery = `http://localhost:3000/DIFFERENT?user_id=${currentUser.user_id}`;
-    return userQuery;
+    const redirectUrl = `http://localhost:3000/googleuserloggedin?user_id=${user_id}`;
+    return redirectUrl;
   } catch (err) {
     return {
       err: 'error occured in checkUser function inside googleController.js',
@@ -71,7 +71,7 @@ async function checkUser(currentUser) {
 const googleController = {};
 
 googleController.login = (req, res) => {
-  console.log('inside googleController.login middleware');
+  // console.log('inside googleController.login middleware');
   // scopes needed for acces to user data (email and profile)
   try {
     const scopes = [
@@ -86,12 +86,6 @@ googleController.login = (req, res) => {
       response_type: 'code',
     });
     return res.redirect(url);
-    // https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?
-    // access_type=offline
-    // &scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email
-    // &response_type=code
-    // &client_id=681582185466-s4phiv7hoor5bso81fqt9nkhkeo80fog.apps.googleusercontent.com
-    // &redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fgooglelogin%2Fcallback&flowName=GeneralOAuthFlow
   } catch (err) {
     return res
       .sendStatus(404)
@@ -108,6 +102,7 @@ googleController.getCredentials = async (req, res, next) => {
   const { code } = req.query;
   // get token using access code
   const { tokens } = await oauth2Client.getToken(code);
+  
   // set credentials object (currently empty) to be tokens
   oauth2Client.setCredentials(tokens);
   try {
@@ -115,8 +110,7 @@ googleController.getCredentials = async (req, res, next) => {
     const decoded = jwt.decode(oauth2Client.credentials.id_token, {
       complete: true,
     });
-    console.log('decoded is defined?', decoded);
-
+    console.log(decoded);
     // put all pieces of data form decoded JWT - sub is unique google account id
     const { sub, email, name, picture } = decoded.payload;
     const googleUserInfo = {
@@ -125,18 +119,17 @@ googleController.getCredentials = async (req, res, next) => {
       name,
       picture,
     };
-    console.log(googleUserInfo);
 
     // create correct user query string to send to frontend for database request
-    const databaseQuery = await checkUser(googleUserInfo);
+    const redirectUrl = await checkUser(googleUserInfo);
   
     // create cookie for each new user session
     // encrtyped jwt should be used in cookie
     const token = jwt.sign(googleUserInfo, ENCODED_SECRET);
     res.cookie('token', token, { httpOnly: true });
     // redirect to databaseQuery string so front end can display data
-    console.log(databaseQuery);
-    res.locals.redirectUrl = databaseQuery;
+    console.log(redirectUrl);
+    res.locals.redirectUrl = redirectUrl;
     next();
   } catch (err) {
     next({
@@ -144,6 +137,10 @@ googleController.getCredentials = async (req, res, next) => {
       message: { err: 'error occured in googleController.getCredentials' },
     });
   }
+};
+
+googleController.getUserInfo = async (req, res, next) => {
+  console.log('inside getUserInfo middleware', req);
 };
 
 module.exports = googleController;
