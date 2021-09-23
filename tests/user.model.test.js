@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {Users} = require('../server/models/mapModels');
+const {Users} = require('../server/models/userModels');
 
 const dbURI = 'mongodb://127.0.0.1/testDB'
 
