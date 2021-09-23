@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const models = require('../models/mapModels');
+const models = require('../models/userModels');
 
 const apiController = {};
 
