@@ -1,6 +1,7 @@
 const express = require('express');
 const apiController = require('../controllers/apiController');
 const path = require('path');
+
 const router = express.Router();
 
 const populationRouter = require(path.join(__dirname, '/populationData.js'));
