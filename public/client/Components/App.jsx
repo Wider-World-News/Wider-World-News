@@ -1,15 +1,18 @@
+/* eslint-disable import/extensions */
+/* eslint-disable max-len */
 /* eslint-disable react/button-has-type */
 /* eslint-disable react/no-array-index-key */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import Map from './Map.jsx';
-import LogIn from './LogIn.jsx';
-import Welcome from './Welcome.jsx';
-import FavoriteList from './FavoriteList.jsx';
-import NewsFeed from './NewsFeed.jsx';
-import Graph from './Graph.jsx';
 import axios from 'axios';
 import * as d3 from 'd3';
+import Map from './Map.jsx';
+// import LogIn from './LogIn.jsx';
+// import Welcome from './Welcome.jsx';
+import FavoriteList from './FavoriteList.jsx';
+import NewsFeed from './NewsFeed.jsx';
+import NavBar from './NavBar.jsx';
+import Graph from './Graph.jsx';
 
 function App() {
   const [isGraphShown, setIsGraphShown] = useState(true);
@@ -29,7 +32,9 @@ function App() {
     })
       .then((response) => {
         const { data } = response.data;
-        const margin = { top: 30, right: 30, bottom: 30, left: 60 };
+        const margin = {
+          top: 30, right: 30, bottom: 30, left: 60,
+        };
         const width = 370 - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
         const svg = d3.select('#graph');
@@ -140,7 +145,7 @@ function App() {
             .attr('class', 'xAxis')
             .attr(
               'transform',
-              `translate(${margin.left},${height + margin.top})`
+              `translate(${margin.left},${height + margin.top})`,
             );
           svg
             .append('g')
@@ -196,74 +201,7 @@ function App() {
           .attr('y', margin.top - 10)
           .text(response.data.countryName);
       })
-      .catch((error) => console.log(error));
-  };
-  const loginButton = (e) => {
-    const username = document.querySelector('#username');
-    const password = document.querySelector('#password');
-
-    if (username.value === '' || password.value === '') {
-      const result =
-        'Please fill out the username and password fields to log in.';
-      changeAttempt(result);
-    } else {
-      const user = {
-        username: username.value,
-        password: password.value,
-      };
-      axios('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: user,
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (!Array.isArray(data)) throw Error('wrong');
-          if (Array.isArray(data)) {
-            setFavorites({});
-            const favoritesObj = {};
-            data.forEach((elem) => {
-              favoritesObj[elem.title] = elem.link;
-            });
-            setFavorites(favoritesObj);
-            changeUser(username.value);
-            changeLoginStatus(true);
-          }
-        })
-        .catch((err) => changeAttempt('Incorrect username or password!'));
-    }
-  };
-
-  const signUp = (e) => {
-    const username = document.querySelector('#username');
-    const password = document.querySelector('#password');
-
-    if (username.value === '' || password.value === '') {
-      const result =
-        'Please fill out the username and password fields to sign up.';
-      changeAttempt(result);
-    } else if (password.value.length < 5) {
-      const result = 'Please create a password longer than 5 characters';
-      changeAttempt(result);
-    } else {
-      const user = {
-        username: username.value,
-        password: password.value,
-      };
-      axios('/api/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: user,
-      })
-        .then((res) => {
-          if (res.status === 200) {
-            changeLoginStatus(true);
-            changeUser(username.value);
-          }
-        })
-
-        .catch((err) => console.log(err));
-    }
+      .catch((error) => alert(`${graphInput}is not a Country`));
   };
 
   const getPosts = (countryName) => {
@@ -302,27 +240,20 @@ function App() {
     });
   };
 
-  const signOut = () => {
-    changeLoginStatus(false);
-    changeAttempt(null);
-    setFavorites({});
-    changeUser(null);
-    setCurrentCountryClick(null);
-    setPosts([]);
-  };
-
   return (
-    <div className='wrapper'>
-      {!loginStatus ? (
-        <LogIn
-          loginButton={loginButton}
-          signUp={signUp}
-          loginAttempt={loginAttempt}
-        />
-      ) : (
-        [<Welcome key={1} currentUser={currentUser} signOut={signOut} />, ,]
-      )}
-      <div id='mainContainer'>
+    <div className="wrapper">
+      <NavBar
+        setFavorites={setFavorites}
+        loginStatus={loginStatus}
+        changeLoginStatus={changeLoginStatus}
+        loginAttempt={loginAttempt}
+        changeAttempt={changeAttempt}
+        currentUser={currentUser}
+        changeUser={changeUser}
+        setCurrentCountryClick={setCurrentCountryClick}
+        setPosts={setPosts}
+      />
+      <div id="mainContainer">
         <Map
           setCurrentCountryClick={setCurrentCountryClick}
           setPosts={setPosts}

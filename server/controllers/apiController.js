@@ -1,6 +1,5 @@
-const axios = require('axios');
 const bcrypt = require('bcryptjs');
-const models = require('../models/mapModels');
+const models = require('../models/userModels');
 
 const apiController = {};
 
@@ -15,7 +14,7 @@ apiController.createUser = async (req, res, next) => {
 
     const user = await models.Users.findOne({ username });
 
-    if (user) return res.send('User already created').status(304);
+    if (user) return res.status(201).send('User already created');
 
     await models.Users.create(newUser);
 
@@ -36,14 +35,11 @@ apiController.createUser = async (req, res, next) => {
 // function to verify user when the user tries to login
 apiController.verifyUser = async (req, res, next) => {
   try {
+    console.log(req.body);
     const { username, password } = req.body;
-
     const user = await models.Users.findOne({ username });
-
     const hashedPW = user.password;
-
     const compare = bcrypt.compareSync(password, hashedPW);
-
     if (!compare) throw Error('Incorrect username or password. Please try again.');
 
     console.log(`User: ${username} logged in`);

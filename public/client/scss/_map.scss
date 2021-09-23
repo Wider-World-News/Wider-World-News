@@ -47,6 +47,7 @@ p {
 .wrapper {
   display: flex;
   height: 60%;
+  margin-top: 100px;
 
   #articleDiv {
     // scrolling
@@ -127,4 +128,16 @@ p {
   .mapboxgl-ctrl-attrib-button {
     display: none !important;
   }
+
+}
+nav {
+  display: flex;
+  flex-direction: row-reverse;
+  position: fixed;
+  top: 0;
+  height: 100px;
+  width: 100%;
+  padding: 2px;
+  // justify-content: space-between;
+  // overflow: hidden;
 }

@@ -1,9 +1,11 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-loop-func */
 // import mapboxGl from 'mapbox-gl/dist/mapbox-gl.js';
 import mapboxGl from 'mapbox-gl/dist/mapbox-gl.js';
 import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import * as d3 from 'd3';
+
 mapboxGl.accessToken =
   'pk.eyJ1IjoibGlhbWZvbnRlcyIsImEiOiJja3RsbzdjdmQxeGZxMnBwODJ1aWlpMjgwIn0.tQGIes1AYOO8KIoAJYHTzQ';
 //set interval -> every 100? ms check state and render the appropriate popup where the mouse is located... maybe?
