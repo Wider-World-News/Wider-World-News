@@ -14,8 +14,14 @@ apiController.createUser = async (req, res, next) => {
 
     const user = await models.Users.findOne({ username });
 
+    // if (user) return res.status(201).send('User already created');
+
     if (user) return res.status(201).send('User already created');
 
+    // user google account
+    // if non google user already has account, reject signup and promot fotrgot my password
+    // if google user already has account, send to get user data
+    
     await models.Users.create(newUser);
 
     console.log(`User: ${username} signed up`);
@@ -36,6 +42,9 @@ apiController.createUser = async (req, res, next) => {
 apiController.verifyUser = async (req, res, next) => {
   try {
     console.log(req.body);
+    if (!req.body.username) {
+      console.log(res.locals);
+    }
     const { username, password } = req.body;
     const user = await models.Users.findOne({ username });
     const hashedPW = user.password;
@@ -58,7 +67,7 @@ apiController.verifyUser = async (req, res, next) => {
 apiController.getUserData = async (req, res, next) => {
   try {
     const user = await models.Users.findOne({ username: res.locals.user });
-
+    console.log(user);
     // changed elem => elem.name to elem=>elem.link
     const favoriteArticles = user.favorites.map((elem) => elem);
 

@@ -27,9 +27,18 @@ router.post('/signup', apiController.createUser, (req, res) => {
 });
 
 // route and middlewares to execute when user tries to login
-router.post(
+router.use(
   '/login',
   apiController.verifyUser,
+  apiController.getUserData,
+  (req, res) => {
+    res.status(200).json(res.locals.data);
+  },
+);
+
+router.use(
+  '/connectwithgoogle',
+  apiController.createUser,
   apiController.getUserData,
   (req, res) => {
     res.status(200).json(res.locals.data);

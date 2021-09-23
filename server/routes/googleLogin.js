@@ -6,6 +6,7 @@ const router = express.Router();
 
 // file dependencies
 const googleController = require('../controllers/googleController.js');
+const apiController = require('../controllers/apiController.js');
 
 // executes when a user signs in with google, redirects to /callback
 router.get('/', googleController.login);
@@ -22,8 +23,12 @@ router.get('/callback', googleController.getCredentials, (req, res) => {
 });
 
 // redirected from callback
-router.use(`/googleuserloggedin?user_id`, googleController.getUserInfo, (req, res) => {
-  console.log(res);
-});
+router.use('/googleuserloggedin/:user_id/',
+  (req, res, next) => {
+    // res.locals.user = req.params.user_id;
+    res.locals.username = req.params.user_id;
+    res.locals.password = req.params.user_id;
+    res.redirect('/api/login');
+  });
 
 module.exports = router;

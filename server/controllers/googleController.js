@@ -59,7 +59,8 @@ async function checkUser(currentUser) {
       // console.log(newUser);
     }
     // take user_id & prepare query link for frontend to GET user's info from databse
-    const redirectUrl = `http://localhost:3000/googleuserloggedin?user_id=${user_id}`;
+    const redirectUrl = `/googlelogin/googleuserloggedin/${user_id}`;
+    
     return redirectUrl;
   } catch (err) {
     return {
@@ -110,11 +111,12 @@ googleController.getCredentials = async (req, res, next) => {
     const decoded = jwt.decode(oauth2Client.credentials.id_token, {
       complete: true,
     });
-    console.log(decoded);
+    // console.log(decoded);
     // put all pieces of data form decoded JWT - sub is unique google account id
     const { sub, email, name, picture } = decoded.payload;
     const googleUserInfo = {
       user_id: sub,
+      password: sub,
       email,
       name,
       picture,
@@ -122,7 +124,7 @@ googleController.getCredentials = async (req, res, next) => {
 
     // create correct user query string to send to frontend for database request
     const redirectUrl = await checkUser(googleUserInfo);
-  
+    
     // create cookie for each new user session
     // encrtyped jwt should be used in cookie
     const token = jwt.sign(googleUserInfo, ENCODED_SECRET);
