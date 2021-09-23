@@ -137,8 +137,14 @@ function Map(props) {
         const timer = window.setInterval(() => {
           readyToRun = true;
         }, 400);
+        document.addEventListener('mousemove', (e) => {
+          if (document.querySelectorAll('.mapboxgl-popup').length > 1) {
+            removePopups();
+          }
+        });
         map.current.on('mouseenter', `${MAP_ID}+${i}`, async (e) => {
-          if (!document.querySelector('.mapboxgl-popup')) {
+          if (!document.querySelector('.mapboxgl-popup') && readyToRun) {
+            readyToRun = false;
             const countryName = e.features[0].properties.name_en;
             const populationData = await fetchPopulationData(countryName);
             popupMarker = new mapboxGl.Popup({ closeOnMove: false })
@@ -182,9 +188,7 @@ function Map(props) {
 
           if (clickCountryId !== previousCountryClicked) {
             setCurrentCountryClick(countryName);
-
             getPosts(countryName);
-
             previousCountryClicked = clickCountryId;
           }
 
