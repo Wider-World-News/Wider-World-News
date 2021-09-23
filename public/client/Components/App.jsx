@@ -29,13 +29,15 @@ function App() {
       'Uganda',
       'Uruguay',
       'Finland',
-      'Sweden',
+      'South Africa',
       'Uzbekistan',
       'Sudan',
       'Australia',
       'Egypt',
       'Thailand',
       'China',
+      'Germany',
+      'France',
     ];
     axios({
       method: 'GET',
@@ -235,7 +237,6 @@ function App() {
   const getPosts = (countryName) => {
     setTimeout(async () => {
       const postFetchData = await axios(`/api/getArticles/${countryName}`);
-      // const postsArr = await postFetchData.json();
       setPosts(postFetchData.data);
     }, 1000);
   };
@@ -311,7 +312,7 @@ function App() {
               {({ index }) => (
                 <>
                   <p style={{ paddingRight: '0.5em' }}>
-                    {tickerPosts[index % 5]}!
+                    {tickerPosts[index % 5]}
                   </p>
                 </>
               )}

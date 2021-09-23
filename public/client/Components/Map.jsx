@@ -38,22 +38,6 @@ function Map(props) {
       });
     }
   };
-  // const popup = (event) => {
-  //   const canvas = map.current.getCanvas();
-  //   const node = document.querySelector('.mapboxgl-popup');
-  //   // console.log(node);
-  //   if (event) {
-  //     canvas.style.cursor = 'pointer';
-  //     popupMarker.innerHTML = 'alskdfjalskdfj';
-  //     popupMarker.setLngLat([event.lngLat.lng, event.lngLat.lat]);
-  //     // node.style.top = `${event.clientY}px`;
-  //     node.style.display = 'block';
-  //   } else {
-  //     canvas.style.cursor = '';
-  //     node.style.display = 'none';
-  //     popupMarker.innerHTML = '';
-  //   }
-  // };
   useEffect(() => {
     if (map.current) return; // initialize map only once
     map.current = new mapboxGl.Map({
