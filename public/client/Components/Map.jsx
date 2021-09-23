@@ -127,7 +127,7 @@ function Map(props) {
 
         map.current.on('mousemove', `${MAP_ID}+${i}`, (e) => {
           if (!document.querySelector('.mapboxgl-popup')) {
-            popupMarker = new mapboxGl.Popup({ closeOnMove: true })
+            popupMarker = new mapboxGl.Popup({ closeOnMove: false })
               .setLngLat([e.lngLat.lng, e.lngLat.lat])
               .setHTML('<h1>Hello</h1>')
               // <p>Country: ${countryName} </p><p>Population: ${populationData} </p>`
