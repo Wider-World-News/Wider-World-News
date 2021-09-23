@@ -10,7 +10,17 @@ import Welcome from './Welcome.jsx';
 
 function NavBar(props) {
   const {
-    setFavorites, loginStatus, changeLoginStatus, loginAttempt, changeAttempt, currentUser, changeUser, setCurrentCountryClick, setPosts,
+    setIsGraphShown,
+    isGraphShown,
+    setFavorites,
+    loginStatus,
+    changeLoginStatus,
+    loginAttempt,
+    changeAttempt,
+    currentUser,
+    changeUser,
+    setCurrentCountryClick,
+    setPosts,
   } = props;
 
   const loginButton = (e) => {
@@ -18,7 +28,8 @@ function NavBar(props) {
     const password = document.querySelector('#password');
 
     if (username.value === '' || password.value === '') {
-      const result = 'Please fill out the username and password fields to log in.';
+      const result =
+        'Please fill out the username and password fields to log in.';
       changeAttempt(result);
     } else {
       const user = {
@@ -52,7 +63,8 @@ function NavBar(props) {
     const password = document.querySelector('#password');
 
     if (username.value === '' || password.value === '') {
-      const result = 'Please fill out the username and password fields to sign up.';
+      const result =
+        'Please fill out the username and password fields to sign up.';
       changeAttempt(result);
     } else if (password.value.length < 5) {
       const result = 'Please create a password longer than 5 characters';
@@ -71,8 +83,7 @@ function NavBar(props) {
           if (res.status === 201) {
             const result = 'You already have an account ya big dumbo';
             changeAttempt(result);
-          }
-          else if (res.status === 200) {
+          } else if (res.status === 200) {
             changeLoginStatus(true);
             changeUser(username.value);
           }
@@ -93,7 +104,15 @@ function NavBar(props) {
   return (
     // eslint-disable-next-line react/jsx-no-comment-textnodes
     <nav>
-      {!loginStatus ? <LogIn loginButton={loginButton} signUp={signUp} loginAttempt={loginAttempt} /> : [<Welcome key={1} currentUser={currentUser} signOut={signOut} />]}
+      {!loginStatus ? (
+        <LogIn
+          loginButton={loginButton}
+          signUp={signUp}
+          loginAttempt={loginAttempt}
+        />
+      ) : (
+        [<Welcome key={1} currentUser={currentUser} signOut={signOut} />]
+      )}
     </nav>
   );
 }
