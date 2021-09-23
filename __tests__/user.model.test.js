@@ -22,6 +22,7 @@ afterEach(async () => {
 });
 afterAll(async () => {
   await mongoose.connection.close();
+  
 })
 
 describe("user unit tests" , () => {
