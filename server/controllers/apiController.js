@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const models = require('../models/userModels');
+const models = require('../models/mapModels');
 
 const apiController = {};
 
@@ -49,7 +49,8 @@ apiController.verifyUser = async (req, res, next) => {
     const user = await models.Users.findOne({ username });
     const hashedPW = user.password;
     const compare = bcrypt.compareSync(password, hashedPW);
-    if (!compare) throw Error('Incorrect username or password. Please try again.');
+    if (!compare)
+      throw Error('Incorrect username or password. Please try again.');
 
     console.log(`User: ${username} logged in`);
     res.locals.user = username;

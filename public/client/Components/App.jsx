@@ -2,8 +2,8 @@
 /* eslint-disable max-len */
 /* eslint-disable react/button-has-type */
 /* eslint-disable react/no-array-index-key */
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
+import Ticker from 'react-ticker';
 import axios from 'axios';
 import * as d3 from 'd3';
 import Map from './Map.jsx';
@@ -22,7 +22,33 @@ function App() {
   const [currentUser, changeUser] = useState(null);
   const [currentCountryClick, setCurrentCountryClick] = useState(null);
   const [posts, setPosts] = useState([]);
-
+  const [tickerPosts, setTickerPosts] = useState([]);
+  useEffect(() => {
+    const random = Math.floor(Math.random() * 10);
+    const countryArr = [
+      'Uganda',
+      'Uruguay',
+      'Finland',
+      'South Africa',
+      'Uzbekistan',
+      'Sudan',
+      'Australia',
+      'Egypt',
+      'Thailand',
+      'China',
+      'Germany',
+      'France',
+    ];
+    axios({
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      url: `api/getArticles/${countryArr[random]}`,
+    }).then((response) => {
+      const titles = [];
+      response.data.forEach((el) => titles.push(el.title));
+      setTickerPosts(titles);
+    });
+  }, []);
   //grabs svg in graphHolder div to graph when country is clicked in mapbox, replaces graph on graphholder if it is there
   const getGraph = (graphInput, indicatorInput) => {
     axios({
@@ -33,11 +59,15 @@ function App() {
       .then((response) => {
         const { data } = response.data;
         const margin = {
-          top: 30, right: 30, bottom: 30, left: 60,
+          top: 30,
+          right: 30,
+          bottom: 30,
+          left: 60,
         };
-        const width = 370 - margin.left - margin.right;
-        const height = 400 - margin.top - margin.bottom;
+        const width = 400 - margin.left - margin.right;
+        const height = 420 - margin.top - margin.bottom;
         const svg = d3.select('#graph');
+        svg.attr('width', width).attr('height', height);
         svg.on('dblclick', resizeChart);
         const xScale = d3
           .scaleUtc()
@@ -145,7 +175,7 @@ function App() {
             .attr('class', 'xAxis')
             .attr(
               'transform',
-              `translate(${margin.left},${height + margin.top})`,
+              `translate(${margin.left},${height + margin.top})`
             );
           svg
             .append('g')
@@ -207,7 +237,6 @@ function App() {
   const getPosts = (countryName) => {
     setTimeout(async () => {
       const postFetchData = await axios(`/api/getArticles/${countryName}`);
-      // const postsArr = await postFetchData.json();
       setPosts(postFetchData.data);
     }, 1000);
   };
@@ -239,10 +268,32 @@ function App() {
       },
     });
   };
-
+  const buttonArr = [];
+  if (isGraphShown) {
+    buttonArr.push(
+      <button className='active' onClick={() => setIsGraphShown(true)}>
+        Show Graph
+      </button>
+    );
+    buttonArr.push(
+      <button onClick={() => setIsGraphShown(false)}>Show Posts</button>
+    );
+  } else {
+    buttonArr.push(
+      <button onClick={() => setIsGraphShown(true)}>Show Graph</button>
+    );
+    buttonArr.push(
+      <button className='active' onClick={() => setIsGraphShown(false)}>
+        Show Posts
+      </button>
+    );
+  }
   return (
-    <div className="wrapper">
+    <div className='wrapper'>
+      <h1 className='header'>Wider World News </h1>
       <NavBar
+        isGraphShown={isGraphShown}
+        setIsGraphShown={setIsGraphShown}
         setFavorites={setFavorites}
         loginStatus={loginStatus}
         changeLoginStatus={changeLoginStatus}
@@ -253,45 +304,100 @@ function App() {
         setCurrentCountryClick={setCurrentCountryClick}
         setPosts={setPosts}
       />
-      <div id="mainContainer">
-        <Map
-          setCurrentCountryClick={setCurrentCountryClick}
-          setPosts={setPosts}
-          getPosts={getPosts}
-          getGraph={getGraph}
-          isGraphShown={isGraphShown}
-        />
-        {!isGraphShown && (
-          <>
-            <NewsFeed
-              currentCountryClick={currentCountryClick}
-              posts={posts}
-              currentFavorites={currentFavorites}
-              setFavorites={setFavorites}
-              addFavorite={addFavorite}
-              deleteFavorite={deleteFavorite}
-            />
-            <FavoriteList
-              currentFavorites={currentFavorites}
-              deleteFavorite={deleteFavorite}
-            />
-          </>
-        )}
-        <button onClick={() => setIsGraphShown(!isGraphShown)}>
-          Change Displays!
-        </button>
-        {isGraphShown && (
-          <div>
-            <select id='worldBankSelector'>
-              <option value='DPANUSSPB'>Economic</option>
-              <option value='SP.DYN.CBRT.IN'>Health</option>
-              <option value='SP.POP.SCIE.RD.P6'>Science and Technology</option>
-              <option value='EN.ATM.CO2E.KT'>Environmental Quality</option>
-              <option value='AG.LND.AGRI.ZS'>Agricultural Development</option>
-            </select>
-            <Graph getGraph={getGraph} />
-          </div>
-        )}
+      <div id='mainContainer'>
+        <div id='buttonHolder'>{buttonArr}</div>
+        <div id='ticker'>
+          {tickerPosts.length > 0 && (
+            <Ticker>
+              {({ index }) => (
+                <>
+                  <p style={{ paddingRight: '0.5em' }}>
+                    {tickerPosts[index % 5]}
+                  </p>
+                </>
+              )}
+            </Ticker>
+          )}
+        </div>
+
+        <div id='mapAndSideContainer'>
+          <Map
+            setCurrentCountryClick={setCurrentCountryClick}
+            setPosts={setPosts}
+            getPosts={getPosts}
+            getGraph={getGraph}
+            isGraphShown={isGraphShown}
+          />
+          {!isGraphShown && (
+            <>
+              <NewsFeed
+                currentCountryClick={currentCountryClick}
+                posts={posts}
+                currentFavorites={currentFavorites}
+                setFavorites={setFavorites}
+                addFavorite={addFavorite}
+                deleteFavorite={deleteFavorite}
+              />
+              <FavoriteList
+                currentFavorites={currentFavorites}
+                deleteFavorite={deleteFavorite}
+              />
+            </>
+          )}
+          {isGraphShown && (
+            <>
+              <form id='worldBankSelector'>
+                Graph Options
+                <label htmlFor='DPANUSSPB'>
+                  <input
+                    value='DPANUSSPB'
+                    type='radio'
+                    name='worldBankSelector'
+                    checked
+                  />
+                  Economic
+                </label>
+                <label htmlFor='SP.DYN.CBRT.IN'>
+                  <input
+                    value='SP.DYN.CBRT.IN'
+                    input
+                    type='radio'
+                    name='worldBankSelector'
+                  />
+                  Health
+                </label>
+                <label htmlFor='SP.POP.SCIE.RD.P6'>
+                  <input
+                    value='SP.POP.SCIE.RD.P6'
+                    input
+                    type='radio'
+                    name='worldBankSelector'
+                  />
+                  Science and Technology
+                </label>
+                <label htmlFor='EN.ATM.CO2E.KT'>
+                  <input
+                    value='EN.ATM.CO2E.KT'
+                    input
+                    type='radio'
+                    name='worldBankSelector'
+                  />
+                  Environmental Quality
+                </label>
+                <label htmlFor='AG.LND.AGRI.ZS'>
+                  <input
+                    value='AG.LND.AGRI.ZS'
+                    input
+                    type='radio'
+                    name='worldBankSelector'
+                  />
+                  Agricultural Development
+                </label>
+              </form>
+              <Graph getGraph={getGraph} />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
