@@ -3,7 +3,8 @@ const {Users} = require('../server/models/mapModels');
 
 const dbURI = 'mongodb://127.0.0.1/testDB'
 
-
+require("dotenv").config();
+jest.setTimeout(6000);
 //before any test, delete the test db
 beforeAll(async () => {
   try {
