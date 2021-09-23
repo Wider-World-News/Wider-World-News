@@ -7,10 +7,27 @@ const router = express.Router();
 const populationRouter = require(path.join(__dirname, '/populationData.js'));
 const newsDataRouter = require(path.join(__dirname, '/newsDataRoute.js'));
 const worldBankRouter = require(path.join(__dirname, '/worldBankRouter.js'));
+const mcache = require('memory-cache');
+
+const cache = (duration) => (req, res, next) => {
+  const key = `__express__${req.originalUrl || req.url}`;
+  const cachedBody = mcache.get(key);
+  if (cachedBody) {
+    // console.log('pulling from cache');
+    return res.send(cachedBody);
+  }
+  res.sendResponse = res.send;
+  res.send = (body) => {
+    // console.log('has been cached');
+    mcache.put(key, body, duration * 1000);
+    res.sendResponse(body);
+  };
+  next();
+};
 // router.get('/population/:countryName', apiController.getPopulationData, (req, res) => res.status(200).json(res.locals.population));
 
 //route to population data router
-router.use('/population', populationRouter);
+router.use('/population', cache(10), populationRouter);
 
 //route to news data router for articles
 router.use('/getArticles', newsDataRouter);

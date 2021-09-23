@@ -1,21 +1,23 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-loop-func */
 // import mapboxGl from 'mapbox-gl/dist/mapbox-gl.js';
 import mapboxGl from 'mapbox-gl/dist/mapbox-gl.js';
 import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import * as d3 from 'd3';
 
 mapboxGl.accessToken =
   'pk.eyJ1IjoibGlhbWZvbnRlcyIsImEiOiJja3RsbzdjdmQxeGZxMnBwODJ1aWlpMjgwIn0.tQGIes1AYOO8KIoAJYHTzQ';
-
+//set interval -> every 100? ms check state and render the appropriate popup where the mouse is located... maybe?
 function Map(props) {
   const { setCurrentCountryClick, getPosts } = props;
 
-  let popup;
+  let popupMarker;
+  const map = useRef(null);
+
   let populationData;
   let previousCountryHover;
   let previousCountryClicked;
-
-  const map = useRef(null);
 
   const fetchPopulationData = async (countryName) => {
     try {
@@ -28,6 +30,7 @@ function Map(props) {
   };
 
   const removePopups = () => {
+    // d3.selectAll('.mapboxgl-popup').remove();
     const popups = document.querySelectorAll('.mapboxgl-popup');
     if (popups.length > 1) {
       popups.forEach((element) => {
@@ -35,7 +38,6 @@ function Map(props) {
       });
     }
   };
-
   useEffect(() => {
     if (map.current) return; // initialize map only once
     map.current = new mapboxGl.Map({
@@ -109,76 +111,59 @@ function Map(props) {
             ],
           },
         });
-
-        map.current.on('mouseenter', `${MAP_ID}+${i}`, () => {
-          removePopups();
-          map.current.getCanvas().style.cursor = 'pointer';
-        });
-
-        map.current.on('mouseleave', `${MAP_ID}+${i}`, () => {
-          map.current.getCanvas().style.cursor = '';
-          removePopups();
-        });
-
-        // 'mapboxgl-popup mapboxgl-popup-anchor-bottom popup';
-
-        // eslint-disable-next-line no-loop-func
+        let readyToRun = true;
         map.current.on('mousemove', `${MAP_ID}+${i}`, (e) => {
-          removePopups();
-          const countryName = e.features[0].properties.name_en;
-          if (e.features.length > 0) {
-            if (hoveredCountryId !== null) {
-              map.current.setFeatureState(
-                {
-                  source: MAPSOURCE,
-                  sourceLayer: MAP_SOURCE_LAYER,
-                  id: hoveredCountryId,
-                },
-                { hover: false }
-              );
-            }
-            hoveredCountryId = e.features[0].id;
-            if (previousCountryHover !== hoveredCountryId) {
-              fetchPopulationData(countryName)
-                .then((data) => {
-                  populationData = data;
-                  popup = new mapboxGl.Popup({ closeOnMove: true })
-                    .setLngLat([e.lngLat.lng, e.lngLat.lat])
-                    .setHTML(
-                      `
-                  <p>Country: ${countryName} </p><p>Population: ${populationData.toLocaleString()} </p>`
-                    )
-                    .addTo(map.current);
-                  popup.addClassName('popup');
-                })
-                .catch((err) => console.log(err));
-            } else {
-              popup = new mapboxGl.Popup({ closeOnMove: true })
-                .setLngLat([e.lngLat.lng, e.lngLat.lat])
-                .setHTML(
-                  `
-                <p>Country: ${countryName} </p><p>Population: ${populationData.toLocaleString()} </p>`
-                )
-                .addTo(map.current);
-              popup.addClassName('popup');
-            }
-            previousCountryHover = hoveredCountryId;
-
-            map.current.setFeatureState(
-              {
-                source: MAPSOURCE,
-                sourceLayer: MAP_SOURCE_LAYER,
-                id: hoveredCountryId,
-              },
-              { hover: true }
-            );
+          if (document.querySelector('.mapboxgl-popup') && readyToRun) {
+            popupMarker.setLngLat([e.lngLat.lng, e.lngLat.lat]);
+            readyToRun = false;
           }
         });
+        const timer = window.setInterval(() => {
+          readyToRun = true;
+        }, 400);
+        document.addEventListener('mousemove', (e) => {
+          if (document.querySelectorAll('.mapboxgl-popup').length > 1) {
+            removePopups();
+          }
+        });
+        map.current.on('mouseenter', `${MAP_ID}+${i}`, async (e) => {
+          if (!document.querySelector('.mapboxgl-popup') && readyToRun) {
+            readyToRun = false;
+            const countryName = e.features[0].properties.name_en;
+            const populationData = await fetchPopulationData(countryName);
+            popupMarker = new mapboxGl.Popup({ closeOnMove: false })
+              .setLngLat([e.lngLat.lng, e.lngLat.lat])
+              .setHTML(
+                `
+              <p>Country: ${countryName} </p><p>Population: ${
+                  typeof populationData === 'object'
+                    ? 'none found :('
+                    : populationData
+                } </p>`
+              )
+              .addTo(map.current);
+            popupMarker.addClassName('popup');
+          } else {
+            const countryName = e.features[0].properties.name_en;
+            const populationData = await fetchPopulationData(countryName);
+            popupMarker.setLngLat([e.lngLat.lng, e.lngLat.lat]);
+            popupMarker.setHTML(`
+            <p>Country: ${countryName} </p><p>Population: ${
+              typeof populationData === 'object'
+                ? 'none found :('
+                : populationData
+            } </p>`);
+          }
+        });
+        map.current.on('mouseleave', `${MAP_ID}+${i}`, removePopups());
 
         map.current.on('click', `${MAP_ID}+${i}`, (e) => {
           clickCountryId = e.features[0].id;
           const countryName = e.features[0].properties.name_en;
-          const indicator = document.querySelector('#worldBankSelector');
+          const indicator = document.querySelector(
+            'input[name=worldBankSelector]:checked'
+          );
+          console.log(indicator.value);
           let indicatorName;
           if (indicator) {
             indicatorName = indicator.value;
@@ -187,9 +172,7 @@ function Map(props) {
 
           if (clickCountryId !== previousCountryClicked) {
             setCurrentCountryClick(countryName);
-
             getPosts(countryName);
-
             previousCountryClicked = clickCountryId;
           }
 
@@ -248,7 +231,7 @@ function Map(props) {
     });
   });
 
-  return <div id='mapContainer' />;
+  return <div id='mapContainer'></div>;
 }
 
 Map.propTypes = {

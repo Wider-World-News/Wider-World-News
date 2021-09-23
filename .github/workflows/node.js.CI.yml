@@ -1,13 +1,15 @@
 name: NodeJS CI
 on: 
   pull_request:
-    types: [opened]
+    types: [opened, reopened]
     branches:
       - '*'
 
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+    env: 
+      MONGO_URI: ${{secrets.MONGO_URI}}
     strategy:
       matrix:
         node-version: [12.x, 14.x]
