@@ -1,8 +1,6 @@
-/* eslint-disable max-len */
-/* eslint-disable import/no-dynamic-require */
 const express = require('express');
-const path = require('path');
 const apiController = require('../controllers/apiController');
+const path = require('path');
 
 const router = express.Router();
 
@@ -15,12 +13,12 @@ const cache = (duration) => (req, res, next) => {
   const key = `__express__${req.originalUrl || req.url}`;
   const cachedBody = mcache.get(key);
   if (cachedBody) {
-    console.log('pulling from cache');
+    // console.log('pulling from cache');
     return res.send(cachedBody);
   }
   res.sendResponse = res.send;
   res.send = (body) => {
-    console.log('has been cached');
+    // console.log('has been cached');
     mcache.put(key, body, duration * 1000);
     res.sendResponse(body);
   };
@@ -28,20 +26,15 @@ const cache = (duration) => (req, res, next) => {
 };
 // router.get('/population/:countryName', apiController.getPopulationData, (req, res) => res.status(200).json(res.locals.population));
 
-<<<<<<< HEAD
 //route to population data router
 router.use('/population', cache(10), populationRouter);
-=======
-// route to population data router
-router.use('/population', populationRouter);
->>>>>>> dev
 
-// route to news data router for articles
+//route to news data router for articles
 router.use('/getArticles', newsDataRouter);
 
-// will route requests for world bank to the world bank router
+//will route requests for world bank to the world bank router
 router.use('/', worldBankRouter);
-// may want to change route from world bank to something else
+//may want to change route from world bank to something else
 
 // route to sign-up
 router.post('/signup', apiController.createUser, (req, res) => {
@@ -55,7 +48,7 @@ router.post(
   apiController.getUserData,
   (req, res) => {
     res.status(200).json(res.locals.data);
-  },
+  }
 );
 
 // route and middlewares to execute when user adds favourite links
