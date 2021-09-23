@@ -13,12 +13,12 @@ const cache = (duration) => (req, res, next) => {
   const key = `__express__${req.originalUrl || req.url}`;
   const cachedBody = mcache.get(key);
   if (cachedBody) {
-    console.log('pulling from cache');
+    // console.log('pulling from cache');
     return res.send(cachedBody);
   }
   res.sendResponse = res.send;
   res.send = (body) => {
-    console.log('has been cached');
+    // console.log('has been cached');
     mcache.put(key, body, duration * 1000);
     res.sendResponse(body);
   };

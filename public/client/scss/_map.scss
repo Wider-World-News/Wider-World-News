@@ -51,6 +51,8 @@ p {
   .ticker {
     max-height: 2.2rem;
   }
+  margin-top: 100px;
+
   #articleDiv {
     // scrolling
     text-overflow: clip;
@@ -124,10 +126,23 @@ p {
       // background: #f5f5f5;
       // box-shadow:  41px 41px 82px #626262,
       //        -41px -41px 82px #ffffff;
-      transition: 0.1s;
     }
   }
   .mapboxgl-ctrl-attrib-button {
     display: none !important;
   }
+  .mapboxgl-popup {
+    transition: 0.13s;
+  }
+}
+nav {
+  display: flex;
+  flex-direction: row-reverse;
+  position: fixed;
+  top: 0;
+  height: 100px;
+  width: 100%;
+  padding: 2px;
+  // justify-content: space-between;
+  // overflow: hidden;
 }
