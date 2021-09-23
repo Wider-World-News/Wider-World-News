@@ -17,7 +17,7 @@ const randomString = require('random-string');
 // mongoose schema for users
 const User = require('../models/mapModels');
 
-//You must create a .env file to store client ID, Client secret, and Redirect Uri follow .env file example
+// .env file stores client ID, Client secret, and Redirect Uri
 // required for reading .env file
 require('dotenv').config();
 
@@ -33,14 +33,27 @@ const oauth2Client = new google.auth.OAuth2(
 // functionality to check if new user needs to be created
 async function checkUser(currentUser) {
   console.log('currentUser:', currentUser);
+  const {
+    user_id,
+    email,
+    name,
+    picture,
+  } = currentUser;
   try {
     // check if user is currently in database
-    const user = await User.DATABSENAME.find({ user_id: currentUser.user_id });
+    const user = await User.Users.find({ username: user_id });
     // if no user found, create new user and return user_id
     if (Array.isArray(user) && user.length === 0) {
       // create new User query string out of passed in currentUser object
-      // should be changed to /different enpoint
-      const newUser = await User.DATABASENAME.create(currentUser);
+
+      const newUser = await User.Users.create({
+        username: user_id,
+        password: user_id,
+        favorites: [],
+        email,
+        name,
+        picture,
+      });
 
       // check in the console for newUser
       console.log(newUser);
@@ -116,12 +129,13 @@ googleController.getCredentials = async (req, res, next) => {
 
     // create correct user query string to send to frontend for database request
     const databaseQuery = await checkUser(googleUserInfo);
-    console.log('do we reach this point?');
+  
     // create cookie for each new user session
     // encrtyped jwt should be used in cookie
     const token = jwt.sign(googleUserInfo, ENCODED_SECRET);
     res.cookie('token', token, { httpOnly: true });
     // redirect to databaseQuery string so front end can display data
+    console.log(databaseQuery);
     res.locals.redirectUrl = databaseQuery;
     next();
   } catch (err) {

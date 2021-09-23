@@ -25,6 +25,9 @@ const userSchema = new Schema({
   username: { type: String, required: true },
   password: { type: String, required: true },
   favorites: [{ title: String, link: String }],
+  email: { type: String, required: false },
+  name: { type: String, required: false },
+  picture: { type: String, required: false },
 });
 
 // the below method runs right before the document is saved on the db.
