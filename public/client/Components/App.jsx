@@ -1,15 +1,17 @@
+/* eslint-disable import/extensions */
+/* eslint-disable max-len */
 /* eslint-disable react/button-has-type */
 /* eslint-disable react/no-array-index-key */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
+import axios from 'axios';
+import * as d3 from 'd3';
 import Map from './Map.jsx';
 import LogIn from './LogIn.jsx';
 import Welcome from './Welcome.jsx';
 import FavoriteList from './FavoriteList.jsx';
 import NewsFeed from './NewsFeed.jsx';
 import Graph from './Graph.jsx';
-import axios from 'axios';
-import * as d3 from 'd3';
 
 function App() {
   const [isGraphShown, setIsGraphShown] = useState(true);
@@ -20,7 +22,7 @@ function App() {
   const [currentCountryClick, setCurrentCountryClick] = useState(null);
   const [posts, setPosts] = useState([]);
 
-  //grabs svg in graphHolder div to graph when country is clicked in mapbox, replaces graph on graphholder if it is there
+  // grabs svg in graphHolder div to graph when country is clicked in mapbox, replaces graph on graphholder if it is there
   const getGraph = (arg) => {
     const graphInput = arg;
     axios({
@@ -51,7 +53,7 @@ function App() {
         const xAxis = d3.axisBottom(xScale).tickFormat(d3.format('d'));
         const yAxis = d3.axisLeft(yScale);
 
-        //updates graph if it is in graphHolder
+        // updates graph if it is in graphHolder
         function updateChart(event) {
           if (event.selection) {
             const extent = event.selection;

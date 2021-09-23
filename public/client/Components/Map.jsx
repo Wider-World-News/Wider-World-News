@@ -1,11 +1,11 @@
+/* eslint-disable import/extensions */
 /* eslint-disable no-loop-func */
 // import mapboxGl from 'mapbox-gl/dist/mapbox-gl.js';
 import mapboxGl from 'mapbox-gl/dist/mapbox-gl.js';
 import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-mapboxGl.accessToken =
-  'pk.eyJ1IjoibGlhbWZvbnRlcyIsImEiOiJja3RsbzdjdmQxeGZxMnBwODJ1aWlpMjgwIn0.tQGIes1AYOO8KIoAJYHTzQ';
+mapboxGl.accessToken = 'pk.eyJ1IjoibGlhbWZvbnRlcyIsImEiOiJja3RsbzdjdmQxeGZxMnBwODJ1aWlpMjgwIn0.tQGIes1AYOO8KIoAJYHTzQ';
 
 function Map(props) {
   const { setCurrentCountryClick, getPosts } = props;
