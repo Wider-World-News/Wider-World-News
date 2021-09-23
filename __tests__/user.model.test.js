@@ -1,13 +1,12 @@
 const mongoose = require('mongoose');
-const {Users} = require('../server/models/mapModels');
+const {Users} = require('../server/models/userModels');
 
 const dbURI = 'mongodb://127.0.0.1/testDB'
-
 
 //before any test, delete the test db
 beforeAll(async () => {
   try {
-    await mongoose.connect(dbURI || 'mongodb://localhost/YOUR_DB_NAME', {
+    await mongoose.connect(dbURI, {
         useNewUrlParser: true,
         useUnifiedTopology: true
       }, () =>
