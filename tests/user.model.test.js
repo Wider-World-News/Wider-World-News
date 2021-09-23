@@ -3,10 +3,10 @@ const {Users} = require('../server/models/userModels');
 
 const dbURI = 'mongodb://127.0.0.1/testDB'
 
+mongoose.disconnect();
 //before any test, delete the test db
 beforeAll(async () => {
   try {
-    await mongoose.disconnect();
     await mongoose.connect(dbURI, {
         useNewUrlParser: true,
         useUnifiedTopology: true
