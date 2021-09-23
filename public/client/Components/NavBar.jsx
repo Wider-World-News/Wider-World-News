@@ -1,6 +1,9 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable max-len */
-import React, { useEffect, useState } from 'react';
+/* eslint-disable import/extensions */
+/* eslint-disable react/prop-types */
+/* eslint-disable max-len */
+import React from 'react';
 import axios from 'axios';
 import LogIn from './LogIn.jsx';
 import Welcome from './Welcome.jsx';

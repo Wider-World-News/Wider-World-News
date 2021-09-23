@@ -1,7 +1,8 @@
+/* eslint-disable import/extensions */
 /* eslint-disable max-len */
 /* eslint-disable react/button-has-type */
 /* eslint-disable react/no-array-index-key */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import axios from 'axios';
 import * as d3 from 'd3';

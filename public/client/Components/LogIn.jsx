@@ -8,7 +8,8 @@ function LogIn(props) {
   const { loginButton, signUp, loginAttempt } = props;
   return (
     <>
-      <div className="g-signin2" data-onsuccess="onSignIn">Log in with Google</div>
+      <a href="/googlelogin"><button>Log in with Google</button></a>
+      {/* <div className="g-signin2" data-onsuccess="onSignIn">Log in with Google</div> */}
       <button onClick={signUp} value="Sign-Up"> Sign-Up </button>
       <button onClick={loginButton} value="Log-In"> Log In </button>
       <input name="password" placeholder="password" id="password" autoComplete="off" type="password" />
@@ -18,13 +19,5 @@ function LogIn(props) {
     </>
   );
 }
-
-// LogIn.propTypes = {
-//   // eslint-disable-next-line react/forbid-prop-types
-//   loginButton: PropTypes.func.isRequired,
-//   signUp: PropTypes.func.isRequired,
-//   // eslint-disable-next-line react/forbid-prop-types
-//   loginAttempt: PropTypes.any.isRequired,
-// };
 
 export default LogIn;

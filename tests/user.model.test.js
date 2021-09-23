@@ -1,18 +1,25 @@
-const { interpolate } = require('d3-interpolate');
 const mongoose = require('mongoose');
 const {Users} = require('../server/models/mapModels');
 
-const dbURL = 'mongodb://127.0.0.1/testDB'
+const dbURI = 'mongodb://127.0.0.1/testDB'
 
 
 //before any test, delete the test db
 beforeAll(async () => {
-  mongoose.connect(dbURL);
+  try {
+    await mongoose.connect(dbURI || 'mongodb://localhost/YOUR_DB_NAME', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      }, () =>
+      console.log("connected"));
+  } catch (error) {
+    console.log("could not connect");
+  }  
   await Users.deleteMany({});
 });
 //after each test, delete the db in case we chain tests
-afterEach(() => {
-  Users.deleteMany({});
+afterEach(async () => {
+  await Users.deleteMany({});
 });
 afterAll(async () => {
   await mongoose.connection.close();
@@ -20,10 +27,8 @@ afterAll(async () => {
 
 describe("user unit tests" , () => {
   it('can create a new user', async () => {
-    await Users.create({ username: "testUser", password: "testPassword" });
-    User.find({}).sort({_id: -1}).limit(1)
-        // .then((products) => {
-              // console.log(products[0].voice) 
-    // })
+    const createdUser = await Users.create({ username: "testUser", password: "testPassword" });
+    const lastUser = await Users.findOne({}).sort({_id: -1}).limit(1);
+    expect(lastUser.username).toEqual(createdUser.username);
   });
 });
