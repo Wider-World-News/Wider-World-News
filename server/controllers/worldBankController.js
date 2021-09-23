@@ -23,7 +23,7 @@ worldBankController.getEconomicData = (req, res, next) => {
   };
   const yAxes = {
     'SP.DYN.CBRT.IN': 'Birth rate, crude (per 1000 people)',
-    DPANYSSPB: 'Exchange rate, new LCU per USD',
+    DPANUSSPB: 'Exchange rate, new LCU per USD',
     'SP.POP.SCIE.RD.P6': 'Researchers in R&D (per million people)',
     'EN.ATM.CO2E.KT': 'CO2 Emissions (kton)',
     'EN.ATM.CO2E.KTbig': 'CO2 Emissions (megaton)',
