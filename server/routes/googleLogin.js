@@ -1,3 +1,4 @@
+/* eslint-disable import/extensions */
 const express = require('express');
 const { google } = require('googleapis');
 

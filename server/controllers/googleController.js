@@ -15,7 +15,7 @@ const jwt = require('jsonwebtoken');
 const randomString = require('random-string');
 
 // mongoose schema for users
-const User = require('../models/mapModels');
+const User = require('../models/userModels');
 
 // .env file stores client ID, Client secret, and Redirect Uri
 // required for reading .env file
