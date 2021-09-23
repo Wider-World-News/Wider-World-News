@@ -21,18 +21,13 @@ const User = require('../models/mapModels');
 // required for reading .env file
 require('dotenv').config();
 
-const {
-  CLIENT_ID,
-  CLIENT_SECRET,
-  REDIRECT_URI,
-  ENCODED_SECRET,
-} = process.env;
+const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, ENCODED_SECRET } = process.env;
 
 // from googleapi docs
 const oauth2Client = new google.auth.OAuth2(
   CLIENT_ID,
   CLIENT_SECRET,
-  REDIRECT_URI,
+  REDIRECT_URI
 );
 
 // functionality to check if new user needs to be created
@@ -54,7 +49,9 @@ async function checkUser(currentUser) {
     const userQuery = `http://localhost:3000/DIFFERENT?user_id=${currentUser.user_id}`;
     return userQuery;
   } catch (err) {
-    return { err: 'error occured in checkUser function inside googleController.js' };
+    return {
+      err: 'error occured in checkUser function inside googleController.js',
+    };
   }
 }
 
@@ -70,7 +67,7 @@ googleController.login = (req, res) => {
     ];
     // generate url using Google Api library
     const url = oauth2Client.generateAuthUrl({
-    // default is 'online', set to 'offline' to get a refresh_token)
+      // default is 'online', set to 'offline' to get a refresh_token)
       access_type: 'offline',
       scope: scopes,
       response_type: 'code',
@@ -86,7 +83,7 @@ googleController.login = (req, res) => {
     return res
       .sendStatus(404)
       .message(
-        'There was an error with your request to the server, please try again',
+        'There was an error with your request to the server, please try again'
       );
   }
 };
@@ -102,21 +99,13 @@ googleController.getCredentials = async (req, res, next) => {
   oauth2Client.setCredentials(tokens);
   try {
     // take token id, turn it into human readable info to read users email/name/prof picture, etc.
-    const decoded = jwt.decode(
-      oauth2Client.credentials.id_token,
-      {
-        complete: true,
-      },
-    );
+    const decoded = jwt.decode(oauth2Client.credentials.id_token, {
+      complete: true,
+    });
     console.log('decoded is defined?', decoded);
 
     // put all pieces of data form decoded JWT - sub is unique google account id
-    const {
-      sub,
-      email,
-      name,
-      picture,
-    } = decoded.payload;
+    const { sub, email, name, picture } = decoded.payload;
     const googleUserInfo = {
       user_id: sub,
       email,

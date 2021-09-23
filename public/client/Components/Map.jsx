@@ -178,13 +178,17 @@ function Map(props) {
         map.current.on('click', `${MAP_ID}+${i}`, (e) => {
           clickCountryId = e.features[0].id;
           const countryName = e.features[0].properties.name_en;
-          console.log(countryName);
-          props.getGraph(countryName);
+          const indicator = document.querySelector('#worldBankSelector');
+          let indicatorName;
+          if (indicator) {
+            indicatorName = indicator.value;
+            props.getGraph(countryName, indicatorName);
+          }
+
           if (clickCountryId !== previousCountryClicked) {
             setCurrentCountryClick(countryName);
-            if (!props.isGraphShown) {
-              getPosts(countryName);
-            }
+
+            getPosts(countryName);
 
             previousCountryClicked = clickCountryId;
           }
