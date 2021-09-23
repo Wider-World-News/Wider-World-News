@@ -33,7 +33,7 @@ function App() {
       'Uzbekistan',
       'Sudan',
       'Australia',
-      'Japan',
+      'Egypt',
       'Thailand',
       'China',
     ];
@@ -57,11 +57,15 @@ function App() {
       .then((response) => {
         const { data } = response.data;
         const margin = {
-          top: 30, right: 30, bottom: 30, left: 60,
+          top: 30,
+          right: 30,
+          bottom: 30,
+          left: 60,
         };
-        const width = 370 - margin.left - margin.right;
-        const height = 400 - margin.top - margin.bottom;
+        const width = 400 - margin.left - margin.right;
+        const height = 420 - margin.top - margin.bottom;
         const svg = d3.select('#graph');
+        svg.attr('width', width).attr('height', height);
         svg.on('dblclick', resizeChart);
         const xScale = d3
           .scaleUtc()
@@ -169,7 +173,7 @@ function App() {
             .attr('class', 'xAxis')
             .attr(
               'transform',
-              `translate(${margin.left},${height + margin.top})`,
+              `translate(${margin.left},${height + margin.top})`
             );
           svg
             .append('g')
@@ -263,36 +267,32 @@ function App() {
       },
     });
   };
-
+  const buttonArr = [];
+  if (isGraphShown) {
+    buttonArr.push(
+      <button className='active' onClick={() => setIsGraphShown(true)}>
+        Show Graph
+      </button>
+    );
+    buttonArr.push(
+      <button onClick={() => setIsGraphShown(false)}>Show Posts</button>
+    );
+  } else {
+    buttonArr.push(
+      <button onClick={() => setIsGraphShown(true)}>Show Graph</button>
+    );
+    buttonArr.push(
+      <button className='active' onClick={() => setIsGraphShown(false)}>
+        Show Posts
+      </button>
+    );
+  }
   return (
-<<<<<<< HEAD
     <div className='wrapper'>
-      <div>
-        {tickerPosts.length > 0 && (
-          <Ticker>
-            {({ index }) => (
-              <>
-                <p style={{ paddingRight: '0.5em' }}>
-                  {tickerPosts[index % 5]}!
-                </p>
-              </>
-            )}
-          </Ticker>
-        )}
-      </div>
-      {!loginStatus ? (
-        <LogIn
-          loginButton={loginButton}
-          signUp={signUp}
-          loginAttempt={loginAttempt}
-        />
-      ) : (
-        [<Welcome key={1} currentUser={currentUser} signOut={signOut} />, ,]
-      )}
-      <div id='mainContainer'>
-=======
-    <div className="wrapper">
+      <h1 className='header'>Wider World News </h1>
       <NavBar
+        isGraphShown={isGraphShown}
+        setIsGraphShown={setIsGraphShown}
         setFavorites={setFavorites}
         loginStatus={loginStatus}
         changeLoginStatus={changeLoginStatus}
@@ -303,46 +303,100 @@ function App() {
         setCurrentCountryClick={setCurrentCountryClick}
         setPosts={setPosts}
       />
-      <div id="mainContainer">
->>>>>>> caching
-        <Map
-          setCurrentCountryClick={setCurrentCountryClick}
-          setPosts={setPosts}
-          getPosts={getPosts}
-          getGraph={getGraph}
-          isGraphShown={isGraphShown}
-        />
-        {!isGraphShown && (
-          <>
-            <NewsFeed
-              currentCountryClick={currentCountryClick}
-              posts={posts}
-              currentFavorites={currentFavorites}
-              setFavorites={setFavorites}
-              addFavorite={addFavorite}
-              deleteFavorite={deleteFavorite}
-            />
-            <FavoriteList
-              currentFavorites={currentFavorites}
-              deleteFavorite={deleteFavorite}
-            />
-          </>
-        )}
-        <button onClick={() => setIsGraphShown(!isGraphShown)}>
-          Change Displays!
-        </button>
-        {isGraphShown && (
-          <div>
-            <select id='worldBankSelector'>
-              <option value='DPANUSSPB'>Economic</option>
-              <option value='SP.DYN.CBRT.IN'>Health</option>
-              <option value='SP.POP.SCIE.RD.P6'>Science and Technology</option>
-              <option value='EN.ATM.CO2E.KT'>Environmental Quality</option>
-              <option value='AG.LND.AGRI.ZS'>Agricultural Development</option>
-            </select>
-            <Graph getGraph={getGraph} />
-          </div>
-        )}
+      <div id='mainContainer'>
+        <div id='buttonHolder'>{buttonArr}</div>
+        <div id='ticker'>
+          {tickerPosts.length > 0 && (
+            <Ticker>
+              {({ index }) => (
+                <>
+                  <p style={{ paddingRight: '0.5em' }}>
+                    {tickerPosts[index % 5]}!
+                  </p>
+                </>
+              )}
+            </Ticker>
+          )}
+        </div>
+
+        <div id='mapAndSideContainer'>
+          <Map
+            setCurrentCountryClick={setCurrentCountryClick}
+            setPosts={setPosts}
+            getPosts={getPosts}
+            getGraph={getGraph}
+            isGraphShown={isGraphShown}
+          />
+          {!isGraphShown && (
+            <>
+              <NewsFeed
+                currentCountryClick={currentCountryClick}
+                posts={posts}
+                currentFavorites={currentFavorites}
+                setFavorites={setFavorites}
+                addFavorite={addFavorite}
+                deleteFavorite={deleteFavorite}
+              />
+              <FavoriteList
+                currentFavorites={currentFavorites}
+                deleteFavorite={deleteFavorite}
+              />
+            </>
+          )}
+          {isGraphShown && (
+            <>
+              <form id='worldBankSelector'>
+                Graph Options
+                <label htmlFor='DPANUSSPB'>
+                  <input
+                    value='DPANUSSPB'
+                    type='radio'
+                    name='worldBankSelector'
+                    checked
+                  />
+                  Economic
+                </label>
+                <label htmlFor='SP.DYN.CBRT.IN'>
+                  <input
+                    value='SP.DYN.CBRT.IN'
+                    input
+                    type='radio'
+                    name='worldBankSelector'
+                  />
+                  Health
+                </label>
+                <label htmlFor='SP.POP.SCIE.RD.P6'>
+                  <input
+                    value='SP.POP.SCIE.RD.P6'
+                    input
+                    type='radio'
+                    name='worldBankSelector'
+                  />
+                  Science and Technology
+                </label>
+                <label htmlFor='EN.ATM.CO2E.KT'>
+                  <input
+                    value='EN.ATM.CO2E.KT'
+                    input
+                    type='radio'
+                    name='worldBankSelector'
+                  />
+                  Environmental Quality
+                </label>
+                <label htmlFor='AG.LND.AGRI.ZS'>
+                  <input
+                    value='AG.LND.AGRI.ZS'
+                    input
+                    type='radio'
+                    name='worldBankSelector'
+                  />
+                  Agricultural Development
+                </label>
+              </form>
+              <Graph getGraph={getGraph} />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -127,11 +127,16 @@ function Map(props) {
             ],
           },
         });
+        let readyToRun = true;
         map.current.on('mousemove', `${MAP_ID}+${i}`, (e) => {
-          if (document.querySelector('.mapboxgl-popup')) {
+          if (document.querySelector('.mapboxgl-popup') && readyToRun) {
             popupMarker.setLngLat([e.lngLat.lng, e.lngLat.lat]);
+            readyToRun = false;
           }
         });
+        const timer = window.setInterval(() => {
+          readyToRun = true;
+        }, 400);
         map.current.on('mouseenter', `${MAP_ID}+${i}`, async (e) => {
           if (!document.querySelector('.mapboxgl-popup')) {
             const countryName = e.features[0].properties.name_en;
@@ -165,7 +170,10 @@ function Map(props) {
         map.current.on('click', `${MAP_ID}+${i}`, (e) => {
           clickCountryId = e.features[0].id;
           const countryName = e.features[0].properties.name_en;
-          const indicator = document.querySelector('#worldBankSelector');
+          const indicator = document.querySelector(
+            'input[name=worldBankSelector]:checked'
+          );
+          console.log(indicator.value);
           let indicatorName;
           if (indicator) {
             indicatorName = indicator.value;
